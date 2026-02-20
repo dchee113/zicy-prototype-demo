@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280">
+    <title>Zicy — Tag Management Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://unpkg.com/lucide-static@latest/font/lucide.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- ======== SIDEBAR ======== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <svg viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2" />
+                    <path d="M10 16l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="sidebar-item active" data-view="dashboard" onclick="switchView('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    <span class="sidebar-item-label">AI Visibility Report</span>
+                </a>
+                <a class="sidebar-item" data-view="prompt-manager" onclick="switchView('prompt-manager')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    <span class="sidebar-item-label">Prompt Manager</span>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <a class="sidebar-item placeholder" title="Chat"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg></a>
+                <a class="sidebar-item placeholder" title="Settings"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg></a>
+                <a class="sidebar-item placeholder" title="Help"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg></a>
+                <div class="sidebar-avatar" title="User Profile"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg></div>
+            </div>
+        </aside>
+
+        <!-- ======== MAIN ======== -->
+        <div class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-actions">
+                    <div class="header-bell"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg></div>
+                    <div class="header-user"><span>AIMS</span> <svg width="12" height="12" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg></div>
+                    <button class="btn-ask-zicy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg> Ask Zicy</button>
+                </div>
+            </header>
+
+            <div class="page-container">
+
+                <!-- =============== VIEW: AI VISIBILITY REPORT =============== -->
+                <div class="view-section active" id="view-dashboard">
+                    <h1 class="page-title">AI Visibility Report</h1>
+                    <div class="page-meta">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <path d="M3 9h18" />
+                        </svg>
+                        Brand: AIMS | Report based on <span id="dash-prompt-count">12</span> prompts and 5 platforms
+                    </div>
+                    <div class="page-meta">Last Update Date: Dec 25 - Jan 23</div>
+
+                    <!-- Metric Cards — 3-column layout -->
+                    <div class="dashboard-metrics-grid" id="dash-metrics">
+                        <!-- Filled by JS -->
+                    </div>
+
+                    <!-- Competitive AI Performance -->
+                    <div class="card competitive-card">
+                        <div class="competitive-header">
+                            <div class="card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M12 20V10" />
+                                    <path d="M18 20V4" />
+                                    <path d="M6 20v-4" />
+                                </svg> Competitive AI Performance</div>
+                            <span class="competitive-subtitle">Competing against 5 top brands</span>
+                        </div>
+                        <table class="data-table" id="competitive-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-th">Brand Name <span class="sort-arrows">↕</span></th>
+                                    <th class="sortable-th center">Brand Mention Coverage <span
+                                            class="sort-arrows">↕</span></th>
+                                    <th class="sortable-th center">Avg. Ranking <span class="sort-arrows">↕</span></th>
+                                    <th class="sortable-th center">Citations <span class="sort-arrows">↕</span></th>
+                                    <th class="sortable-th center">Share of Voice <span class="sort-arrows">↕</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="competitive-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Individual Tracked Prompts -->
+                    <div class="card individual-section">
+                        <div class="individual-header">
+                            <div class="card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 6v6l4 2" />
+                                </svg> Individual Tracked Prompts</div>
+                        </div>
+                        <div class="platform-controls-row">
+                            <div class="platform-pills" id="dash-platform-filters">
+                                <button class="platform-pill active">All Platforms</button>
+                                <button class="platform-pill">ChatGPT</button>
+                                <button class="platform-pill">Gemini</button>
+                                <button class="platform-pill">Perplexity</button>
+                                <button class="platform-pill">Google AI</button>
+                                <button class="platform-pill">AI Overview</button>
+                            </div>
+                            <button class="btn-export"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg> Export Data</button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px"></th>
+                                    <th>Prompt</th>
+                                    <th class="center">Brand Mention Coverage</th>
+                                    <th class="center">Position</th>
+                                    <th class="center">Share of Voice</th>
+                                    <th class="center">Your Brand Mentions</th>
+                                    <th class="center">Total Brand Mentions</th>
+                                    <th class="center">Website Citation Coverage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-prompts-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- =============== VIEW: PROMPT MANAGER =============== -->
+                <div class="view-section" id="view-prompt-manager">
+                    <h1 class="page-title">Prompt Manager</h1>
+                    <p class="page-subtitle">Manage and analyze your tracked prompt performance across AI platforms.</p>
+
+                    <!-- Tab Bar -->
+                    <div class="tab-bar">
+                        <button class="tab-btn active" data-tab="tracked" onclick="switchTab('tracked')">Tracked
+                            Prompt</button>
+                        <button class="tab-btn" data-tab="manage" onclick="switchTab('manage')">Manage Prompt</button>
+                        <button class="tab-btn" data-tab="tags" onclick="switchTab('tags')">Manage Tags</button>
+                    </div>
+
+                    <!-- ===== TAB: TRACKED PROMPTS ===== -->
+                    <div class="tab-content active" id="tab-tracked">
+                        <h2 style="font-size:16px;font-weight:700;margin-bottom:16px">Summary Statistics</h2>
+                        <div class="stats-grid" id="tracked-stats"></div>
+                        <div class="tracked-controls-row">
+                            <div class="platform-pills" id="tracked-platform-filters">
+                                <button class="platform-pill active">All Platforms</button>
+                                <button class="platform-pill">ChatGPT</button>
+                                <button class="platform-pill">Gemini</button>
+                                <button class="platform-pill">Perplexity</button>
+                                <button class="platform-pill">Google AI</button>
+                                <button class="platform-pill">AI Overview</button>
+                            </div>
+                            <div class="tracked-controls-right">
+                                <div class="search-bar-container inline" style="width:200px">
+                                    <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                    <input type="text" class="search-bar" placeholder="Search prompts..."
+                                        id="tracked-search">
+                                </div>
+                                <div class="tag-filter-dropdown" id="tag-filter-dropdown">
+                                    <button class="tag-filter-trigger" onclick="UI.toggleTagFilterDropdown()">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                        </svg>
+                                        <span id="tag-filter-label">Filter by tag</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                    </button>
+                                    <div class="tag-filter-panel" id="tag-filter-panel">
+                                        <div class="tag-filter-panel-header">
+                                            <span class="tag-filter-panel-title">Filter by Tags</span>
+                                            <button class="tag-filter-clear" onclick="UI.clearTrackedTagFilters()">Clear
+                                                all</button>
+                                        </div>
+                                        <div class="tag-filter-checkboxes" id="tag-filter-checkboxes"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tracked-filter-note"></div>
+                        <div class="card">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30px"></th>
+                                        <th>Prompt</th>
+                                        <th class="center">Brand Mention Coverage</th>
+                                        <th class="center">Position</th>
+                                        <th class="center">Share of Voice</th>
+                                        <th class="center">Your Brand Mentions</th>
+                                        <th class="center">Total Brand Mentions</th>
+                                        <th class="center">Website Citation Coverage</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tracked-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ===== TAB: MANAGE PROMPTS ===== -->
+                    <div class="tab-content" id="tab-manage">
+                        <div class="manage-top-row">
+                            <div class="flex items-center gap-12">
+                                <button class="btn btn-secondary" onclick="UI.generatePrompt()"><svg width="14"
+                                        height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                    </svg> Generate More Prompt</button>
+                                <button class="btn btn-primary" onclick="UI.showCustomPromptModal()"><svg width="14"
+                                        height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                    </svg> Add custom Prompt</button>
+                            </div>
+                            <div class="quota-box">
+                                <div class="quota-row"><span class="quota-label">Weekly Analysis Quota</span><span
+                                        class="quota-value">0 / 999999</span></div>
+                                <div class="quota-row"><span class="quota-label">Prompt Count Status</span><span
+                                        class="quota-value">73 / 999999</span></div>
+                            </div>
+                        </div>
+                        <div class="manage-layout">
+                            <div class="manage-main">
+                                <div class="search-bar-container mb-16">
+                                    <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                    <input type="text" class="search-bar" placeholder="Search prompts..."
+                                        id="manage-search">
+                                </div>
+                                <div class="status-filters" id="manage-filters"></div>
+                                <!-- Draft Section -->
+                                <div id="manage-draft-section"></div>
+                                <!-- Active Section -->
+                                <div id="manage-active-section"></div>
+                                <!-- Paused Section -->
+                                <div id="manage-paused-section"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== TAB: MANAGE TAGS ===== -->
+                <div class="tab-content" id="tab-tags">
+                    <div class="flex items-center justify-between mb-16">
+                        <div>
+                            <h2 style="font-size:16px;font-weight:700">Tag Library</h2>
+                            <p class="text-sm text-muted">Organize your tag library and bulk-assign tags across prompts.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tags-two-panel">
+                        <!-- Left Panel: Tag List -->
+                        <div class="tags-list-panel">
+                            <div class="tags-list-header">
+                                <div class="search-bar-container" style="flex:1">
+                                    <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                    <input type="text" class="search-bar" placeholder="Search tags..." id="tag-search"
+                                        oninput="UI.renderTagsTab()">
+                                </div>
+                            </div>
+                            <div class="tags-list-create">
+                                <input type="text" class="tags-create-input" id="tags-create-input"
+                                    placeholder="+ Create new tag..." maxlength="60"
+                                    onkeypress="if(event.key==='Enter') UI.createInlineTag()">
+                            </div>
+                            <div id="tags-summary" class="tags-summary"></div>
+                            <div class="tags-list-items" id="tags-list-items">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+                        <!-- Right Panel: Tag Detail -->
+                        <div class="tags-detail-panel" id="tags-detail-panel">
+                            <div class="tags-detail-empty">Select a tag to view details</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- ======== MODALS ======== -->
+    <!-- Create Tag Modal -->
+    <div class="modal-overlay" id="modal-create-tag">
+        <div class="modal">
+            <div class="modal-title">Create New Tag</div>
+            <div class="modal-desc">Tags help you organize and filter your prompts. Max 4 words.</div>
+            <label class="form-label">Tag Name</label>
+            <input type="text" class="form-input" id="create-tag-input" placeholder="e.g. Life Insurance"
+                maxlength="60">
+            <div class="form-hint">Maximum 4 words</div>
+            <div class="form-error hidden" id="create-tag-error"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-create-tag')">Cancel</button>
+                <button class="btn btn-primary" onclick="UI.createTag()">Create Tag</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Tag Modal -->
+    <div class="modal-overlay" id="modal-delete-tag">
+        <div class="modal">
+            <div class="modal-title">Delete Tag</div>
+            <div class="modal-desc" id="delete-tag-desc">Are you sure?</div>
+            <div id="delete-tag-prompts" class="text-sm" style="margin-bottom:12px"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-delete-tag')">Cancel</button>
+                <button class="btn btn-danger" onclick="UI.confirmDeleteTag()">Delete Tag</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activate Prompt Modal -->
+    <div class="modal-overlay" id="modal-activate">
+        <div class="modal">
+            <div class="modal-title">Activate Prompt</div>
+            <div class="modal-desc" id="activate-desc">Are you sure you want to activate this prompt?</div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-activate')">Cancel</button>
+                <button class="btn btn-blue" onclick="UI.confirmActivate()">Activate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Prompt Modal -->
+    <div class="modal-overlay" id="modal-custom-prompt">
+        <div class="modal">
+            <div class="modal-title">Add Custom Prompt</div>
+            <div class="modal-desc">Enter the prompt text you want to track.</div>
+            <label class="form-label">Prompt Text</label>
+            <input type="text" class="form-input" id="custom-prompt-input"
+                placeholder="e.g. What is the best data center in Malaysia?">
+            <div class="form-error hidden" id="custom-prompt-error"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-custom-prompt')">Cancel</button>
+                <button class="btn btn-primary" onclick="UI.addCustomPrompt()">Add Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tag Editor Popup (positioned dynamically) -->
+    <div class="tag-editor-popup" id="tag-editor">
+        <div class="tag-editor-title">Edit Tags</div>
+        <div class="tag-editor-current" id="tag-editor-current"></div>
+        <input type="text" class="tag-editor-search" id="tag-editor-search" placeholder="Search or create tag..."
+            oninput="UI.filterTagSuggestions()">
+        <div class="tag-editor-suggestions" id="tag-editor-suggestions"></div>
+        <div class="tag-limit-warning hidden" id="tag-limit-warning">Maximum 5 tags per prompt</div>
+        <div class="tag-editor-actions">
+            <button class="btn btn-sm btn-secondary" onclick="UI.closeTagEditor()">Cancel</button>
+            <button class="btn btn-sm btn-blue" onclick="UI.saveTagEditor()">Save</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Assign Tag Modal -->
+    <div class="modal-overlay" id="modal-assign-tag">
+        <div class="modal">
+            <div class="modal-title" id="assign-tag-title">Assign to Prompts</div>
+            <div class="modal-desc" id="assign-tag-desc">Select prompts to tag</div>
+            <div class="search-bar-container mb-12">
+                <input type="text" class="search-bar" placeholder="Search prompts..." id="assign-prompt-search"
+                    oninput="UI.filterAssignPrompts()">
+            </div>
+            <div class="bulk-prompt-list" id="assign-prompt-list" style="max-height: 250px;"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-assign-tag')">Cancel</button>
+                <button class="btn btn-blue" onclick="UI.confirmAssignTag()">Assign Tag</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Tagged Prompts Modal -->
+    <div class="modal-overlay" id="modal-view-tagged-prompts">
+        <div class="modal">
+            <div class="modal-title" id="view-tagged-title">Tagged Prompts</div>
+            <div class="modal-desc" id="view-tagged-desc">Prompts tagged with "..."</div>
+            <div class="bulk-prompt-list" id="view-tagged-list" style="max-height: 300px;"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-view-tagged-prompts')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+
+</html>
