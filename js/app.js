@@ -4,7 +4,7 @@
    ============================================ */
 
 const ZicyState = (() => {
-    const STORAGE_KEY = 'zicyProtoData_v3';
+    const STORAGE_KEY = 'zicyProtoData_v4';
 
     // ---- Competitor config (static flavour fields only) ----
     const COMPETITOR_CONFIG = [
@@ -100,6 +100,9 @@ const ZicyState = (() => {
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Backup Speed', yourBrand: true },
                         { name: 'Compliance', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: true },
+                        { name: 'SLA Guarantees', yourBrand: true },
+                        { name: 'Global Availability', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.3,15.0],[2,0,2.5,7.5],[1,0,3.8,4.0],[1,0,3.2,3.5],[0,0,0,0.0]])
                 })
@@ -122,6 +125,8 @@ const ZicyState = (() => {
                         { name: 'Customer Support', yourBrand: true },
                         { name: 'Ease of Setup', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: false },
+                        { name: 'Managed Services', yourBrand: false },
                     ],
                     competitors: mkComp([[2,1,2.5,14.0],[3,1,2.2,9.0],[1,1,3.5,4.5],[1,0,3.8,3.0],[1,0,2.8,2.5]])
                 })
@@ -144,6 +149,9 @@ const ZicyState = (() => {
                         { name: 'Pricing & Value', yourBrand: false },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Integrations', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: false },
+                        { name: 'Edge Computing', yourBrand: false },
+                        { name: 'Cost Transparency', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.8,16.0],[1,0,2.6,5.0],[2,1,3.2,7.5],[2,1,3.0,6.0],[0,0,0,0.0]])
                 })
@@ -166,6 +174,8 @@ const ZicyState = (() => {
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Compliance', yourBrand: false },
                         { name: 'Customer Support', yourBrand: false },
+                        { name: 'Edge Computing', yourBrand: false },
+                        { name: 'SLA Guarantees', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.0,18.0],[1,0,2.4,5.5],[1,0,3.5,3.5],[0,0,0,0.0],[1,1,2.5,3.0]])
                 })
@@ -188,6 +198,8 @@ const ZicyState = (() => {
                         { name: 'Performance', yourBrand: true },
                         { name: 'Customer Support', yourBrand: false },
                         { name: 'Integrations', yourBrand: true },
+                        { name: 'SLA Guarantees', yourBrand: true },
+                        { name: 'Network Latency', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.5,15.0],[2,0,2.2,8.0],[1,0,3.8,3.5],[1,0,3.5,3.0],[1,0,2.7,2.5]])
                 })
@@ -210,6 +222,8 @@ const ZicyState = (() => {
                         { name: 'Data Security', yourBrand: true },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: true },
+                        { name: 'Global Availability', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.2,14.0],[2,1,2.5,7.0],[1,0,3.6,4.0],[1,0,3.3,3.0],[0,0,0,0.0]])
                 })
@@ -232,6 +246,8 @@ const ZicyState = (() => {
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Data Security', yourBrand: false },
                         { name: 'Performance', yourBrand: true },
+                        { name: 'Disaster Recovery', yourBrand: true },
+                        { name: 'SLA Guarantees', yourBrand: true },
                     ],
                     competitors: mkComp([[2,1,2.4,12.5],[2,1,2.3,8.5],[1,0,3.7,4.0],[1,0,3.4,3.2],[0,0,0,0.0]])
                 })
@@ -254,6 +270,9 @@ const ZicyState = (() => {
                         { name: 'Integrations', yourBrand: true },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Performance', yourBrand: false },
+                        { name: 'Network Latency', yourBrand: true },
+                        { name: 'Multi-cloud Support', yourBrand: true },
+                        { name: 'Edge Computing', yourBrand: false },
                     ],
                     competitors: mkComp([[4,3,2.0,20.0],[1,0,2.8,4.5],[2,1,3.5,6.0],[1,0,3.2,3.0],[1,1,2.5,3.5]])
                 })
@@ -276,6 +295,8 @@ const ZicyState = (() => {
                         { name: 'Integrations', yourBrand: true },
                         { name: 'Performance', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Network Latency', yourBrand: false },
+                        { name: 'Multi-cloud Support', yourBrand: false },
                     ],
                     competitors: mkComp([[4,3,1.8,22.0],[1,0,2.6,4.0],[1,0,3.8,3.5],[0,0,0,0.0],[1,1,2.4,3.0]])
                 })
@@ -298,6 +319,8 @@ const ZicyState = (() => {
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Ease of Setup', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Cost Transparency', yourBrand: false },
+                        { name: 'Managed Services', yourBrand: false },
                     ],
                     competitors: mkComp([[2,1,2.7,13.0],[3,2,2.1,10.5],[1,0,3.6,4.0],[1,0,3.5,3.0],[1,0,2.8,2.5]])
                 })
@@ -320,6 +343,8 @@ const ZicyState = (() => {
                         { name: 'Pricing & Value', yourBrand: false },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Integrations', yourBrand: true },
+                        { name: 'Cost Transparency', yourBrand: false },
+                        { name: 'Global Availability', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.5,17.0],[2,0,2.4,7.5],[3,2,3.0,8.5],[2,1,3.2,6.0],[0,0,0,0.0]])
                 })
@@ -342,6 +367,8 @@ const ZicyState = (() => {
                         { name: 'Data Security', yourBrand: true },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Onboarding', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: false },
+                        { name: 'Global Availability', yourBrand: false },
                     ],
                     competitors: mkComp([[4,3,1.9,21.0],[1,0,2.5,4.5],[2,2,3.3,5.5],[1,0,3.0,3.0],[2,1,2.4,4.5]])
                 })
@@ -365,6 +392,8 @@ const ZicyState = (() => {
                         { name: 'Data Security', yourBrand: true },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Onboarding', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: false },
+                        { name: 'SLA Guarantees', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.1,17.5],[1,0,2.5,4.5],[2,1,3.4,5.0],[1,0,3.0,2.5],[2,1,2.3,5.0]])
                 })
@@ -387,6 +416,9 @@ const ZicyState = (() => {
                         { name: 'Performance', yourBrand: true },
                         { name: 'Scalability', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Edge Computing', yourBrand: true },
+                        { name: 'Multi-cloud Support', yourBrand: false },
+                        { name: 'Cost Transparency', yourBrand: false },
                     ],
                     competitors: mkComp([[4,3,2.0,19.0],[0,0,0,0.0],[2,1,3.2,7.0],[0,0,0,0.0],[2,1,2.5,4.5]])
                 })
@@ -409,6 +441,9 @@ const ZicyState = (() => {
                         { name: 'Integrations', yourBrand: true },
                         { name: 'Performance', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Network Latency', yourBrand: true },
+                        { name: 'Multi-cloud Support', yourBrand: true },
+                        { name: 'Global Availability', yourBrand: true },
                     ],
                     competitors: mkComp([[4,3,1.9,21.0],[1,0,2.7,4.0],[1,0,3.8,3.0],[0,0,0,0.0],[1,1,2.5,3.5]])
                 })
@@ -431,6 +466,8 @@ const ZicyState = (() => {
                         { name: 'Compliance', yourBrand: true },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Customer Support', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: true },
+                        { name: 'Managed Services', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.0,18.5],[1,0,2.4,4.5],[1,0,3.5,3.5],[0,0,0,0.0],[2,2,2.3,5.0]])
                 })
@@ -453,6 +490,9 @@ const ZicyState = (() => {
                         { name: 'Ease of Setup', yourBrand: true },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Onboarding', yourBrand: false },
+                        { name: 'Managed Services', yourBrand: true },
+                        { name: 'Cost Transparency', yourBrand: false },
+                        { name: 'SLA Guarantees', yourBrand: false },
                     ],
                     competitors: mkComp([[2,1,2.6,13.0],[3,2,2.1,10.0],[1,0,3.5,4.0],[1,0,3.4,3.0],[1,0,2.7,2.5]])
                 })
@@ -475,6 +515,8 @@ const ZicyState = (() => {
                         { name: 'Data Security', yourBrand: true },
                         { name: 'Compliance', yourBrand: true },
                         { name: 'Reliability', yourBrand: false },
+                        { name: 'Disaster Recovery', yourBrand: true },
+                        { name: 'SLA Guarantees', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.2,15.5],[2,1,2.4,8.0],[1,0,3.7,3.5],[1,0,3.3,3.0],[1,0,2.6,2.5]])
                 })
@@ -497,6 +539,8 @@ const ZicyState = (() => {
                         { name: 'Performance', yourBrand: true },
                         { name: 'Scalability', yourBrand: true },
                         { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Edge Computing', yourBrand: false },
+                        { name: 'Network Latency', yourBrand: false },
                     ],
                     competitors: mkComp([[4,3,2.0,20.0],[0,0,0,0.0],[2,1,3.3,6.5],[0,0,0,0.0],[2,1,2.6,4.0]])
                 })
@@ -519,6 +563,10 @@ const ZicyState = (() => {
                         { name: 'Pricing & Value', yourBrand: false },
                         { name: 'Reliability', yourBrand: true },
                         { name: 'Integrations', yourBrand: false },
+                        { name: 'Network Latency', yourBrand: false },
+                        { name: 'Edge Computing', yourBrand: false },
+                        { name: 'Global Availability', yourBrand: false },
+                        { name: 'Cost Transparency', yourBrand: false },
                     ],
                     competitors: mkComp([[3,2,2.6,15.5],[1,0,2.5,5.0],[3,2,2.9,9.0],[2,1,3.1,5.5],[0,0,0,0.0]])
                 })

@@ -19,6 +19,14 @@ const KT_COMPETITOR_DATA = {
     'Integrations':       [['Equinix', 44], ['NTT Ltd.', 39], ['TM One', 31]],
     'AI Performance':     [['Equinix', 68], ['NTT Ltd.', 55], ['Vantage Data Centers', 42]],
     'Onboarding':         [['TM One', 75], ['Bridge Data Centres', 58], ['Vantage Data Centers', 45]],
+    'Disaster Recovery':  [['Equinix', 72], ['NTT Ltd.', 58], ['TM One', 41]],
+    'SLA Guarantees':     [['Equinix', 68], ['NTT Ltd.', 55], ['TM One', 43]],
+    'Network Latency':    [['Equinix', 65], ['NTT Ltd.', 52], ['Vantage Data Centers', 38]],
+    'Multi-cloud Support':[['Equinix', 77], ['NTT Ltd.', 63], ['Vantage Data Centers', 51]],
+    'Edge Computing':     [['Equinix', 82], ['NTT Ltd.', 71], ['Vantage Data Centers', 59]],
+    'Global Availability':[['Equinix', 88], ['NTT Ltd.', 74], ['TM One', 52]],
+    'Cost Transparency':  [['TM One', 69], ['Bridge Data Centres', 58], ['Vantage Data Centers', 44]],
+    'Managed Services':   [['TM One', 74], ['NTT Ltd.', 62], ['Bridge Data Centres', 48]],
 };
 
 // ---- Global State ----
@@ -1845,9 +1853,12 @@ const UI = {
                 <span class="desc-pct">${d.pct}%</span>
             </div>`).join('');
 
+        const pillClass = score >= 70 ? 'pos' : score >= 55 ? 'neu' : 'neg';
+        const pillLabel = score >= 70 ? 'Positive' : score >= 55 ? 'Neutral' : 'Negative';
+
         detailEl.innerHTML = `
             <div class="sent-detail-name ${isYou ? 'you' : ''}">${name}${isYou ? ' <span class="badge-you">YOU</span>' : ''}</div>
-            <div class="sent-detail-score">${score} <span class="text-muted" style="font-size:13px">/ 100</span></div>
+            <div class="sent-detail-score" style="display:flex;align-items:center;gap:10px;margin-bottom:14px">${score} <span class="text-muted" style="font-size:13px">/ 100</span> <span class="sentiment-tier-badge ${pillClass}" style="margin:0">${pillLabel}</span></div>
             <div class="profile-section-label pos">Positive associations</div>
             ${barHTML(profile.positiveDescriptors, '')}
             <div class="profile-section-label neu" style="margin-top:12px">Neutral / contextual</div>
@@ -2031,13 +2042,16 @@ const UI = {
 <li><strong>Individual Tracked Prompts</strong> — Flat 6-column table (Prompt, BMC, Position, SoV, Website Citation Coverage, Avg Sentiment). Platform tabs at top filter by platform (cosmetic in prototype). Footer shows prompt count and "View full per-platform breakdown in Prompt Manager →" link.</li>
 </ol>
 
-<h3>Tag Filter Behavior</h3>
+<h3>How Tag Filtering Works</h3>
+<p><strong>The core concept:</strong> Every tracked prompt has one or more tags assigned to it. Selecting a tag filter narrows the active prompt set to only prompts that carry at least one of the selected tags (OR logic, max 3 tags). Every metric and section on this page — and on the Key Topics and Competitive pages — is then re-derived entirely from that filtered prompt set. The data doesn't get "filtered after the fact"; the whole analysis reruns from the smaller pool of prompts.</p>
+<p>Clearing the filter restores the full set of active prompts. The "All tags: X%" reference values on metric cards always show the unfiltered baseline for comparison.</p>
+
+<h3>Tag Filter UI Behavior</h3>
 <ul>
-<li>Global tag filter (<code>trackedFilterTags</code>) is applied to all prompt-based metrics</li>
-<li>When a tag filter is active, the Metrics Band scope header shows active tag names and prompt count</li>
+<li>Tag filter dropdown in the page header — max 3 tags, OR logic, shared global state (<code>trackedFilterTags</code>) across all pages</li>
+<li>When active: Metrics Band scope header shows active tag names and filtered prompt count</li>
 <li>"Switch to All Tags" link in scope header clears the filter</li>
-<li>Metrics Band cards show "All tags: X%" reference when filtered</li>
-<li>Brand Sentiment and Key Topics are static (not yet tag-filtered — future implementation)</li>
+<li>Metrics Band cards show "All tags: X%" reference alongside filtered value</li>
 </ul>
 
 <h3>Interactions</h3>
@@ -2053,7 +2067,6 @@ const UI = {
 <ul>
 <li>Real trend chart data from backend — current chart uses static mock polylines</li>
 <li>Platform tab filtering on Tracked Prompts table</li>
-<li>Tag filter applied to Brand Sentiment and Key Topics sections</li>
 <li>Date range selector (Dec 25 – Jan 23 is static)</li>
 </ul>
 `
@@ -2165,7 +2178,7 @@ const UI = {
                 content: `
 <h3>Page Structure (top to bottom)</h3>
 <ol>
-<li><strong>Page header</strong> — Title, scope subtitle (Brand / Scope / Response count), cosmetic date + export buttons. Subtitle updates dynamically when tag filter changes.</li>
+<li><strong>Page header</strong> — Title, scope subtitle (Brand / Scope / Response count), functional tag filter dropdown (max 3 tags, shared global <code>trackedFilterTags</code> state), cosmetic date + export buttons. Subtitle updates dynamically when tag filter changes.</li>
 <li><strong>Section A — Full Topic Landscape (treemap)</strong> — CSS flex treemap. Rows flex by frequency sum; cells flex by individual frequency. Three colour tiers: green (owned ≥60%), amber (mixed 30–59%), gray (absent &lt;30%). Hover deepens brightness. No click action in v1.</li>
 <li><strong>Section B — Brand Leaders</strong> — Topics where AIMS % leads all competitors. Green left border. Default sort: Your Brand % descending.</li>
 <li><strong>Section C — Battlegrounds</strong> — Topics where AIMS is present but at least one competitor leads. Amber left border. Default sort: Your Brand % descending.</li>
@@ -2180,12 +2193,15 @@ const UI = {
 <li>Competitor data is <strong>static</strong> (hardcoded in <code>KT_COMPETITOR_DATA</code>) — does not respond to tag filter</li>
 </ul>
 
+<h3>How Tag Filtering Works</h3>
+<p><strong>The core concept:</strong> Selecting a tag filter narrows the active prompt set to prompts tagged with at least one selected tag (OR logic). This page then re-derives all topic data — hit counts, your brand fractions, bucket assignments — entirely from that filtered prompt set. Topics can move between Leaders / Battlegrounds / Blind Spots as the prompt scope changes. This is the same mechanism used on the Dashboard and Competitive pages — one shared global state (<code>trackedFilterTags</code>), one filtered prompt list, everything recomputes from it.</p>
+
 <h3>Filter-aware behavior</h3>
 <ul>
 <li>All topic buckets (Leaders/Battlegrounds/Blind Spots) recompute when tag filter changes — topics can move between buckets</li>
 <li>Treemap cell sizes, fractions, and section badges all update with scope</li>
-<li>Competitor data (4th column) is static regardless of filter</li>
-<li>Tag filter state shared globally via <code>trackedFilterTags</code> — same filter as dashboard</li>
+<li>Competitor data (4th column) is static regardless of filter — hardcoded in <code>KT_COMPETITOR_DATA</code></li>
+<li>Tag filter state shared globally via <code>trackedFilterTags</code> — same filter as dashboard and competitive pages</li>
 </ul>
 
 <h3>Data model</h3>
@@ -2217,48 +2233,66 @@ const UI = {
                 content: `
 <h3>Page Structure (top to bottom)</h3>
 <ol>
-<li><strong>Page header</strong> — Title, active prompt count, tag filter dropdown (max 3 tags, shared global state with dashboard).</li>
-<li><strong>Section A — Competitor Benchmark Table</strong> — All 6 brands × 5 metrics. Column groups: Brand Coverage (BMC%, Avg Ranking, Citation Coverage, SoV) and Brand Perception (Avg Sentiment). "YOU" row highlighted. Data derives from <code>ZicyState.getCompetitorMetrics(activePrompts)</code> — filter-aware. "+ Add Competitor" button opens modal (demo only, not persisted).</li>
-<li><strong>Section B — Brand Positioning Matrix</strong> — SVG scatter plot. X axis: Brand Mention Coverage (%), Y axis: Avg Sentiment. Quadrant lines at X=50%, Y=60. Dot click scrolls to Section C and activates that brand profile. Insight strip shows AIMS's current quadrant. Brands legend panel on right links to Section C.</li>
-<li><strong>Section C — Sentiment Profiles</strong> — Left list of all 6 brands, right panel shows selected brand's descriptor bars (positive/neutral/negative). AIMS score reads live from <code>ZicyState.getBrandSentiment()</code>; all other scores and descriptor profiles are static (<code>COMP_PROFILES</code> constant in ui.js). AIMS auto-selected on load.</li>
-<li><strong>Section D — Tag-Level Heatmap</strong> — Rows = 12 confirmed tags, columns = 6 competitors + row avg. Metric toggle: Coverage % / Share of Voice % / Avg Sentiment. Data is static (<code>COMP_HEAT_DATA</code> in ui.js) — not filter-aware (always shows full dataset).</li>
+<li><strong>Page header</strong> — Title, active prompt count, tag filter dropdown (max 3 tags, shared global state with dashboard). Date range and Export buttons are cosmetic.</li>
+<li><strong>Section A — Competitor Benchmark Table</strong> — 6 brands × 6 metrics. Two column groups:
+  <ul>
+    <li><strong>Brand Coverage</strong> (4 cols): BMC%, Avg Ranking, Citations, Share of Voice</li>
+    <li><strong>Brand Perception</strong> (2 cols): Avg Sentiment, Top Descriptors</li>
+  </ul>
+  Color thresholds applied per column:
+  <ul>
+    <li>BMC%: ≥70% green · 40–69% amber · &lt;40% red</li>
+    <li>Avg Ranking: ≤2.5 green · 2.5–3.5 amber · &gt;3.5 red (lower = better)</li>
+    <li>Citations: ≥40% teal · 20–39% amber · &lt;20% red</li>
+    <li>Avg Sentiment: derives color from <code>sentimentClass</code> returned by <code>getCompetitorMetrics()</code> — ≥65 Positive/green · 45–64 Neutral/amber · &lt;45 Negative/red</li>
+  </ul>
+  AIMS row highlighted (you-row blue tint). Data from <code>ZicyState.getCompetitorMetrics(activePrompts)</code> — filter-aware. "+ Add Competitor" opens modal (demo only).
+</li>
+<li><strong>Section B — Sentiment × Coverage Matrix</strong> — SVG scatter plot (<code>viewBox="0 0 480 325"</code>). X axis: Brand Mention Coverage (%), Y axis: Avg Sentiment. Two boundary lines at X=240 (50% coverage) and Y=158 (sentiment 60) divide the chart into 4 quadrants. Quadrant names drawn as SVG corner text (HIDDEN GEMS / CHAMPIONS / NEEDS WORK / AT RISK). "Median" label on horizontal boundary. Dots: r=6 for competitors, r=8 for AIMS with "YOU" text inside. Clicking any dot or legend row calls <code>compGoToBrand(name)</code> — scrolls to Section C and activates that brand. Insight strip above matrix shows AIMS's quadrant with color-coded pill.</li>
+<li><strong>Section C — Competitor Sentiment Profiles</strong> — Left nav list of 6 brands; right panel shows the selected brand's descriptor bars (positive / neutral / negative). AIMS score reads live from <code>ZicyState.getBrandSentiment(activePrompts).score</code>; all other brand scores and all descriptor profiles are static (<code>COMP_PROFILES</code> constant in ui.js). AIMS auto-selected on load via <code>_renderCompProfilesC()</code>. Switching brands calls <code>compShowBrand(name, el)</code>.</li>
+<li><strong>Section D — Tag-Level Heatmap</strong> — Rows = 12 confirmed tags, columns = Aims (YOU) + 5 competitors + Row Avg. Metric toggle (Coverage % / SoV % / Avg Sentiment) calls <code>UI.setCompHeatMetric(metric, btn)</code> and re-renders tbody from static <code>COMP_HEAT_DATA</code>. Heat colors: coverage/SoV — ≥65% green · 40–64% amber · &lt;40% red; sentiment — ≥70 green · 55–69 amber · &lt;55 red. Not filter-aware — always shows full dataset.</li>
 </ol>
+
+<h3>How Tag Filtering Works</h3>
+<p><strong>The core concept:</strong> Selecting a tag filter narrows the active prompt set to prompts tagged with at least one selected tag (OR logic). Sections A and B re-derive all competitor metrics — BMC%, rankings, citations, SoV, sentiment — entirely from that filtered prompt set. This is the same mechanism used on the Dashboard and Key Topics pages — one shared global state (<code>trackedFilterTags</code>), one filtered prompt list, everything recomputes from it.</p>
 
 <h3>Filter behavior</h3>
 <ul>
-<li>Sections A and B recompute when tag filter changes — same <code>trackedFilterTags</code> global as dashboard</li>
-<li>Section C AIMS score updates with filter (other brands are static)</li>
+<li>Sections A and B fully recompute from filtered prompts when tag filter changes</li>
+<li>Section C: AIMS score reads live from filtered prompts; all other brand scores and descriptor profiles are static (<code>COMP_PROFILES</code>)</li>
 <li>Section D heatmap is always full dataset — not filter-aware</li>
-<li>Tag filter dropdown on this page uses existing <code>applyDashTagFilter()</code> function — same state mutation as dashboard</li>
+<li>Tag filter dropdown calls <code>UI.applyDashTagFilter(tagId, checked)</code> — same state mutation as dashboard and Key Topics pages</li>
 </ul>
 
 <h3>SVG Matrix Scale</h3>
 <ul>
-<li>cx = <code>160 + (cov% - 30) * 4</code> (x range 30–90% → cx 160–400)</li>
-<li>cy = <code>295 - (sentiment - 40) * 6.875</code> (sentiment range 40–80 → cy 295–20)</li>
-<li>Boundary lines: x=240 (50% coverage), y=158 (sentiment 60)</li>
+<li><code>cx = 160 + (cov% − 30) × 4</code> — coverage range 30–90% maps to cx 160–400</li>
+<li><code>cy = 295 − (sentiment − 40) × 6.875</code> — sentiment range 40–80 maps to cy 295–20</li>
+<li>Quadrant boundary: cx=240 (50% coverage) | cy=158 (sentiment 60)</li>
+<li>Tick labels: Y = 50/60/70/80 at cy 226/158/89/20 · X = 30%/50%/70%/90% at cx 160/240/320/400</li>
 </ul>
 
-<h3>Static data in ui.js</h3>
+<h3>Static data constants in ui.js</h3>
 <ul>
-<li><code>COMP_BRAND_COLORS</code> — one color per brand for matrix dots and legend</li>
-<li><code>COMP_PROFILES</code> — positive/neutral/negative descriptor arrays per brand</li>
-<li><code>COMP_HEAT_DATA</code> — coverage/sov/sentiment tables for all 12 tags × 6 brands</li>
+<li><code>COMP_BRAND_COLORS</code> — hex color per brand used for matrix dots and legend dots</li>
+<li><code>COMP_PROFILES</code> — positive/neutral/negative descriptor arrays with % values per brand (6 brands total)</li>
+<li><code>COMP_HEAT_DATA</code> — coverage/sov/sentiment tables: 12 tag rows × 6 brand columns + row averages + footer averages</li>
 </ul>
 
 <h3>Add Competitor modal</h3>
 <ul>
-<li>Demo only — shows toast on submit, does not persist or re-render table</li>
-<li>Real version needs: competitor added to COMPETITOR_CONFIG, prompt data seeded, re-render triggered</li>
+<li>Demo only — <code>UI.submitAddCompetitor()</code> shows toast and clears form, does not persist or re-render</li>
+<li>Real version: add to <code>COMPETITOR_CONFIG</code> in app.js, seed per-prompt competitor response data, call <code>renderCompetitive()</code></li>
 </ul>
 
 <hr>
 <h3>Not Shown in Prototype</h3>
 <ul>
-<li>Real competitor prompt data — prototype uses mock data from <code>app.js</code></li>
-<li>Add Competitor persistence — modal is demo only</li>
-<li>Loading/skeleton states on filter change</li>
-<li>Export buttons (cosmetic)</li>
+<li>Real per-competitor prompt-level response data — prototype derives all metrics from mock data in app.js</li>
+<li>Add Competitor persistence</li>
+<li>Loading / skeleton states on filter change</li>
+<li>Export (cosmetic button only)</li>
+<li>Sortable table columns (sort arrows are decorative)</li>
 </ul>
 `
             },

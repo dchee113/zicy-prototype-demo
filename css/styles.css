@@ -3428,6 +3428,9 @@ th.col-per, td.col-per {
     color: #15803D;
     margin: 6px 0 4px;
 }
+.sentiment-tier-badge.neu { background: #F1F5F9; color: #475569; }
+.sentiment-tier-badge.neg { background: #FEE2E2; color: #B91C1C; }
+.sentiment-tier-badge.pos { background: #DCFCE7; color: #15803D; }
 
 .sentiment-context {
     font-size: 11px;
@@ -4269,6 +4272,10 @@ tr.you-row .perception-col { background: rgba(124,58,237,0.06) !important; }
 .sent-detail-name { font-size: 16px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
 .sent-detail-name.you { color: #2563EB; }
 .sent-detail-score { font-size: 12px; color: #64748B; margin-bottom: 14px; }
+.sent-list-pill { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 2px; }
+.sent-list-pill.pos { background: #DCFCE7; color: #15803D; }
+.sent-list-pill.neu { background: #F1F5F9; color: #475569; }
+.sent-list-pill.neg { background: #FEE2E2; color: #B91C1C; }
 
 /* Descriptor bars */
 .desc-bar-wrap { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
