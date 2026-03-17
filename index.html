@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1280">
-    <title>Zicy — Tag Management Prototype</title>
+    <title>Zicy — AI Visibility Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,9 +19,8 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <svg viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2" />
-                    <path d="M10 16l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" />
+                    <circle cx="16" cy="16" r="14" fill="#F97316" fill-opacity="0.15"/>
+                    <polygon points="18,7 10,17 15,17 14,25 22,15 17,15" fill="#F97316"/>
                 </svg>
             </div>
             <nav class="sidebar-nav">
@@ -35,6 +34,31 @@
                     </svg>
                     <span class="sidebar-item-label">AI Visibility Report</span>
                 </a>
+                <div class="sidebar-section-label">Intelligence Reports</div>
+                <a class="sidebar-item" data-view="key-topics" onclick="switchView('key-topics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        <path d="M11 8v6M8 11h6"/>
+                    </svg>
+                    <span class="sidebar-item-label">Key Topics Analysis</span>
+                </a>
+                <a class="sidebar-item nav-placeholder" title="Citations Analysis (coming soon)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                    <span class="sidebar-item-label">Citations Analysis</span>
+                </a>
+                <a class="sidebar-item" data-view="competitive" onclick="switchView('competitive')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    <span class="sidebar-item-label">Competitive Landscape</span>
+                </a>
+                <div class="sidebar-section-label">Tools</div>
                 <a class="sidebar-item" data-view="prompt-manager" onclick="switchView('prompt-manager')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -96,91 +120,393 @@
 
                 <!-- =============== VIEW: AI VISIBILITY REPORT =============== -->
                 <div class="view-section active" id="view-dashboard">
-                    <h1 class="page-title">AI Visibility Report</h1>
-                    <div class="page-meta">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <path d="M3 9h18" />
-                        </svg>
-                        Brand: AIMS | Report based on <span id="dash-prompt-count">12</span> prompts and 5 platforms
-                    </div>
-                    <div class="page-meta">Last Update Date: Dec 25 - Jan 23</div>
 
-                    <!-- Metric Cards — 3-column layout -->
-                    <div class="dashboard-metrics-grid" id="dash-metrics">
-                        <!-- Filled by JS -->
+                    <!-- Page heading -->
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">AI Visibility Report</h1>
+                            <div class="page-meta" style="margin-top:6px">
+                                Brand: AIMS &nbsp;|&nbsp; <span id="dash-prompt-count">12</span> prompts tracked across 5 platforms &nbsp;|&nbsp; Last updated: Dec 25 – Jan 23
+                            </div>
+                        </div>
+                        <div class="page-header-actions">
+                            <!-- Tag filter dropdown -->
+                            <div class="action-dropdown-wrap" id="dash-tag-filter-wrap">
+                                <button class="action-btn" id="dash-tag-filter-btn" onclick="UI.toggleDashTagDropdown(event)">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                                    <span id="dash-tag-filter-label">All Tags</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+                                <div class="action-dropdown" id="dash-tag-dropdown">
+                                    <div class="action-dropdown-search">
+                                        <input type="text" placeholder="Search tags…" oninput="UI.filterDashTagList(this.value)" onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="action-dropdown-limit-note" id="dash-tag-limit-note">Max 3 tags — deselect one to change.</div>
+                                    <div id="dash-tag-list"></div>
+                                </div>
+                            </div>
+                            <!-- Time filter (cosmetic) -->
+                            <button class="action-btn">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Dec 25 – Jan 23
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <!-- Export (cosmetic) -->
+                            <button class="action-btn" onclick="UI.showExportToast()">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Export
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Competitive AI Performance -->
-                    <div class="card competitive-card">
-                        <div class="competitive-header">
-                            <div class="card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path d="M12 20V10" />
-                                    <path d="M18 20V4" />
-                                    <path d="M6 20v-4" />
-                                </svg> Competitive AI Performance</div>
-                            <span class="competitive-subtitle">Competing against 5 top brands</span>
+                    <!-- 1. METRICS BAND -->
+                    <div class="metrics-band">
+                        <div class="metrics-band-header" id="dash-metrics-scope">
+                            <!-- populated by JS -->
+                        </div>
+                        <div class="metrics-grid" id="dash-metrics-grid">
+                            <!-- populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- 2. PLATFORM RADAR + PERFORMANCE TRENDS -->
+                    <div class="card no-padding" style="margin-bottom:20px">
+                        <div class="trends-radar-wrap">
+
+                            <!-- Left: Platform Radar -->
+                            <div class="trends-left">
+                                <div class="radar-title">Platform Coverage <i class="info-icon">i</i></div>
+                                <div class="radar-subtitle">Brand mention coverage by platform</div>
+                                <div class="radar-svg-wrap">
+                                    <svg viewBox="0 0 220 230" width="100%" style="overflow:visible;max-width:190px;">
+                                        <!-- Grid rings -->
+                                        <polygon points="110,90 127.1,97.4 121.0,116.6 99.0,116.6 92.9,97.4" fill="none" stroke="#E2E8F0" stroke-width="1"/>
+                                        <polygon points="110,72 144.2,86.8 132.0,125.2 88.0,125.2 75.8,86.8" fill="none" stroke="#E2E8F0" stroke-width="1"/>
+                                        <polygon points="110,54 161.3,76.2 143.0,133.8 77.0,133.8 58.7,76.2" fill="none" stroke="#E2E8F0" stroke-width="1"/>
+                                        <polygon points="110,36 178.5,65.6 154.0,142.4 66.0,142.4 41.5,65.6" fill="none" stroke="#E2E8F0" stroke-width="1.5"/>
+                                        <!-- Axis lines -->
+                                        <line x1="110" y1="108" x2="110" y2="36" stroke="#E2E8F0" stroke-width="1"/>
+                                        <line x1="110" y1="108" x2="178.5" y2="65.6" stroke="#E2E8F0" stroke-width="1"/>
+                                        <line x1="110" y1="108" x2="154.0" y2="142.4" stroke="#E2E8F0" stroke-width="1"/>
+                                        <line x1="110" y1="108" x2="66.0" y2="142.4" stroke="#E2E8F0" stroke-width="1"/>
+                                        <line x1="110" y1="108" x2="41.5" y2="65.6" stroke="#E2E8F0" stroke-width="1"/>
+                                        <!-- Data polygon (values from PLATFORM_RADAR in app.js via JS) -->
+                                        <polygon id="radar-polygon" points="110,61.9 145.6,96.4 146.8,158.6 76.5,154.0 61.4,92.2" fill="rgba(37,99,235,0.15)" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/>
+                                        <!-- Vertex dots -->
+                                        <circle cx="110" cy="61.9" r="3.5" fill="#2563EB"/>
+                                        <circle cx="145.6" cy="96.4" r="3.5" fill="#2563EB"/>
+                                        <circle cx="146.8" cy="158.6" r="3.5" fill="#2563EB"/>
+                                        <circle cx="76.5" cy="154.0" r="3.5" fill="#2563EB"/>
+                                        <circle cx="61.4" cy="92.2" r="3.5" fill="#2563EB"/>
+                                        <!-- Axis labels -->
+                                        <text x="110" y="28" font-size="10" fill="#64748B" text-anchor="middle">Google AI</text>
+                                        <text x="186" y="58" font-size="10" fill="#64748B" text-anchor="start"><tspan x="186" dy="0">AI</tspan><tspan x="186" dy="12">Overviews</tspan></text>
+                                        <text x="162" y="157" font-size="10" fill="#64748B" text-anchor="start">ChatGPT</text>
+                                        <text x="58" y="157" font-size="10" fill="#64748B" text-anchor="end">Perplexity</text>
+                                        <text x="34" y="93" font-size="10" fill="#64748B" text-anchor="end">Gemini</text>
+                                    </svg>
+                                </div>
+                                <div class="radar-badges" id="dash-radar-badges">
+                                    <!-- populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Right: Performance Trends -->
+                            <div class="trends-right">
+                                <div class="trends-header">
+                                    <span class="trends-title">Performance Trends <i class="info-icon">i</i></span>
+                                    <div class="trends-controls">
+                                        <div class="toggle-group">
+                                            <button class="toggle-btn active" onclick="UI.setTrendPeriod(this)">Weekly</button>
+                                            <button class="toggle-btn" onclick="UI.setTrendPeriod(this)">Monthly</button>
+                                        </div>
+                                        <select class="metric-select">
+                                            <option>All metrics</option>
+                                            <option>Brand Mention Coverage</option>
+                                            <option>Share of Voice</option>
+                                            <option>Avg Ranking</option>
+                                            <option>Citation Coverage</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="trend-chart-area" id="dash-trend-chart">
+                                    <!-- populated by JS -->
+                                </div>
+                                <div class="trend-footer" id="dash-trend-footer">
+                                    <!-- populated by JS -->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 3. COMPETITIVE AI PERFORMANCE -->
+                    <div class="card no-padding" style="margin-bottom:20px">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Competitive AI Performance <i class="info-icon">i</i></div>
+                                <div class="card-subtitle">Brand: AIMS &nbsp;·&nbsp; comparing against 5 brands</div>
+                            </div>
+                            <a class="card-link" onclick="switchView('competitive')" style="cursor:pointer">View Full Competitive Analysis →</a>
                         </div>
                         <table class="data-table" id="competitive-table">
                             <thead>
+                                <tr class="col-group-hdr">
+                                    <th></th>
+                                    <th colspan="4" class="col-group-label-cov">Brand Coverage</th>
+                                    <th colspan="2" class="col-group-label-per">Brand Perception</th>
+                                </tr>
                                 <tr>
-                                    <th class="sortable-th">Brand Name <span class="sort-arrows">↕</span></th>
-                                    <th class="sortable-th center">Brand Mention Coverage <span
-                                            class="sort-arrows">↕</span></th>
-                                    <th class="sortable-th center">Avg. Ranking <span class="sort-arrows">↕</span></th>
-                                    <th class="sortable-th center">Citations <span class="sort-arrows">↕</span></th>
-                                    <th class="sortable-th center">Share of Voice <span class="sort-arrows">↕</span>
-                                    </th>
+                                    <th>Brand Name <span class="sort-arrows">↕</span></th>
+                                    <th class="center col-cov">Brand Mention Coverage <span class="sort-arrows">↕</span></th>
+                                    <th class="center col-cov">Avg. Ranking <span class="sort-arrows">↕</span></th>
+                                    <th class="center col-cov">Citations <span class="sort-arrows">↕</span></th>
+                                    <th class="center col-cov">Share of Voice <span class="sort-arrows">↕</span></th>
+                                    <th class="center col-per">Avg Sentiment <span class="sort-arrows">↕</span></th>
+                                    <th class="col-per">Top Descriptors</th>
                                 </tr>
                             </thead>
                             <tbody id="competitive-body"></tbody>
                         </table>
                     </div>
 
-                    <!-- Individual Tracked Prompts -->
-                    <div class="card individual-section">
-                        <div class="individual-header">
-                            <div class="card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <path d="M12 6v6l4 2" />
-                                </svg> Individual Tracked Prompts</div>
-                        </div>
-                        <div class="platform-controls-row">
-                            <div class="platform-pills" id="dash-platform-filters">
-                                <button class="platform-pill active">All Platforms</button>
-                                <button class="platform-pill">ChatGPT</button>
-                                <button class="platform-pill">Gemini</button>
-                                <button class="platform-pill">Perplexity</button>
-                                <button class="platform-pill">Google AI</button>
-                                <button class="platform-pill">AI Overview</button>
+                    <!-- 4. BRAND SENTIMENT -->
+                    <div class="card no-padding" style="margin-bottom:20px">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Brand Sentiment <i class="info-icon">i</i></div>
+                                <div class="card-subtitle" id="dash-sentiment-subtitle">AIMS &nbsp;·&nbsp; <span id="dash-prompt-count-2">12</span> prompts</div>
                             </div>
-                            <button class="btn-export"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7 10 12 15 17 10" />
-                                    <line x1="12" y1="15" x2="12" y2="3" />
-                                </svg> Export Data</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="sentiment-inner" id="dash-sentiment-inner">
+                                <!-- populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. KEY TOPICS -->
+                    <div class="card no-padding" style="margin-bottom:20px">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Key Topics <i class="info-icon">i</i></div>
+                                <div class="card-subtitle" id="dash-kt-subtitle">18 topics detected across all prompts</div>
+                            </div>
+                            <a class="card-link" style="cursor:pointer" onclick="switchView('key-topics')">View Key Topics Analysis →</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="kt-topics-grid" id="dash-kt-grid">
+                                <!-- populated by JS -->
+                            </div>
+                            <div class="kt-more" id="dash-kt-more"></div>
+                        </div>
+                    </div>
+
+                    <!-- 6. INDIVIDUAL TRACKED PROMPTS -->
+                    <div class="card no-padding" style="margin-bottom:20px">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Tracked Prompts <i class="info-icon">i</i></div>
+                                <div class="card-subtitle" id="dash-prompts-subtitle">AIMS &nbsp;·&nbsp; <span id="dash-prompt-count-3">12</span> prompts</div>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding-bottom:0">
+                            <div class="platform-tabs" id="dash-platform-tabs">
+                                <!-- populated by JS -->
+                            </div>
+                            <div class="table-toolbar">
+                                <span class="table-toolbar-left" id="dash-table-toolbar-label"></span>
+                            </div>
                         </div>
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th style="width:30px"></th>
-                                    <th>Prompt</th>
-                                    <th class="center">Brand Mention Coverage</th>
-                                    <th class="center">Position</th>
-                                    <th class="center">Share of Voice</th>
-                                    <th class="center">Your Brand Mentions</th>
-                                    <th class="center">Total Brand Mentions</th>
-                                    <th class="center">Website Citation Coverage</th>
+                                    <th style="width:42%">Prompt <span class="sort-arrows">↕</span></th>
+                                    <th class="center">Brand Mention<br>Coverage <span class="sort-arrows">↕</span></th>
+                                    <th class="center">Position <span class="sort-arrows">↕</span></th>
+                                    <th class="center">Share of<br>Voice <span class="sort-arrows">↕</span></th>
+                                    <th class="center">Website Citation<br>Coverage <span class="sort-arrows">↕</span></th>
+                                    <th class="center">Avg<br>Sentiment <span class="sort-arrows">↕</span></th>
                                 </tr>
                             </thead>
                             <tbody id="dash-prompts-body"></tbody>
                         </table>
+                        <div class="card-body dash-table-footer">
+                            <span id="dash-table-show-label" style="color:#94A3B8;font-size:12px;"></span>
+                            <a onclick="switchView('prompt-manager'); switchTab('tracked')" style="cursor:pointer">See full prompts analysis →</a>
+                        </div>
                     </div>
+
                 </div>
+
+                <!-- =============== VIEW: COMPETITIVE LANDSCAPE =============== -->
+                <div class="view-section" id="view-competitive">
+
+                    <!-- Page header -->
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Competitive Landscape Analysis</h1>
+                            <div class="page-meta" style="margin-top:6px">
+                                Compare competitor visibility, sentiment, and citation footprint &nbsp;|&nbsp; <span id="comp-prompt-count">20</span> prompts · 5 platforms
+                            </div>
+                        </div>
+                        <div class="page-header-actions">
+                            <!-- Tag filter (reuses global trackedFilterTags) -->
+                            <div class="action-dropdown-wrap" id="comp-tag-filter-wrap">
+                                <button class="action-btn" id="comp-tag-filter-btn" onclick="UI.toggleCompTagDropdown(event)">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                                    <span id="comp-tag-filter-label">All Tags</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+                                <div class="action-dropdown" id="comp-tag-dropdown">
+                                    <div class="action-dropdown-search">
+                                        <input type="text" placeholder="Search tags…" oninput="UI.filterCompTagList(this.value)" onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="action-dropdown-limit-note" id="comp-tag-limit-note" style="display:none">Max 3 tags — deselect one to change.</div>
+                                    <div id="comp-tag-list"></div>
+                                </div>
+                            </div>
+                            <button class="action-btn">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Last 30 days
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <button class="action-btn" onclick="UI.showExportToast()">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Export
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="page-content">
+
+                        <!-- ── A. COMPETITIVE PERFORMANCE TABLE ── -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Competitive Performance Table <span class="info-icon" data-tooltip="Brand Coverage columns show how often each brand appears in AI responses. Brand Perception shows how AI describes each brand. Thresholds: BMC ≥70% strong · 40–69% moderate · <40% low. Ranking ≤2.5 strong · 2.5–3.5 moderate · >3.5 weak.">i</span></div>
+                                    <div class="card-subtitle" id="comp-a-subtitle">All tags · All detected competitors</div>
+                                </div>
+                                <button class="btn-primary" onclick="UI.showModal('modal-add-competitor')">+ Add Competitor</button>
+                            </div>
+                            <div style="padding:0; overflow-x:auto;">
+                                <table id="comp-table">
+                                    <thead>
+                                        <tr class="col-group-row-comp">
+                                            <th class="comp-name-th" rowspan="2">Brand Name ↕</th>
+                                            <th colspan="4" class="col-group-header-left">Brand Coverage</th>
+                                            <th colspan="2" class="col-group-header">Brand Perception</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="cov-col" data-tooltip="% of AI responses that mentioned this brand. Color: ≥70% strong · 40–69% moderate · <40% low">Brand Mention Coverage ↕</th>
+                                            <th class="cov-col" data-tooltip="Average position when brand appeared. Lower = ranked higher. Color: ≤2.5 strong · 2.5–3.5 moderate · >3.5 weak">Avg. Ranking ↕</th>
+                                            <th class="cov-col" data-tooltip="% of responses that included a URL citation. Color: ≥40% strong · 20–39% moderate · <20% low">Citations ↕</th>
+                                            <th class="cov-col" data-tooltip="This brand's share of all brand mentions in the selected scope.">Share of Voice ↓</th>
+                                            <th class="perception-col" data-tooltip="Average sentiment score (0–100). ≥65 Positive · 45–64 Neutral · <45 Negative">Avg Sentiment ↕</th>
+                                            <th class="perception-col">Top Descriptors</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="comp-table-body">
+                                        <!-- populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ── B. SENTIMENT × COVERAGE MATRIX ── -->
+                        <div class="card" id="comp-section-b">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Sentiment × Coverage Matrix <span class="info-icon">i</span></div>
+                                    <div class="card-subtitle">Competitive positioning by brand mention coverage &amp; sentiment</div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="insight-strip" id="comp-insight-strip"><!-- populated by JS --></div>
+                                <div class="matrix-wrap">
+                                    <div class="quadrant-svg-wrap" id="comp-matrix-svg-wrap">
+                                        <!-- SVG populated by JS -->
+                                    </div>
+                                    <div class="matrix-right-col">
+                                        <div class="brands-panel">
+                                            <div class="brands-panel-title">Brands <span style="font-size:10px;font-weight:400;color:#94A3B8;text-transform:none;letter-spacing:0;">· click to view profile</span></div>
+                                            <table class="legend-table">
+                                                <thead><tr><th style="text-align:left;"></th><th>Sentiment</th><th>Coverage</th></tr></thead>
+                                                <tbody id="comp-brands-panel-body"><!-- populated by JS --></tbody>
+                                            </table>
+                                        </div>
+                                        <div class="matrix-quadrant-section">
+                                            <div style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Quadrants</div>
+                                            <div class="matrix-quadrant-labels">
+                                                <div class="matrix-quadrant-label champions">Champions<br><span style="font-weight:400;font-size:9px;">High coverage, high sentiment</span></div>
+                                                <div class="matrix-quadrant-label at-risk">At Risk<br><span style="font-weight:400;font-size:9px;">High coverage, low sentiment</span></div>
+                                                <div class="matrix-quadrant-label hidden-gems">Hidden Gems<br><span style="font-weight:400;font-size:9px;">Low coverage, high sentiment</span></div>
+                                                <div class="matrix-quadrant-label needs-work">Needs Work<br><span style="font-weight:400;font-size:9px;">Low coverage, low sentiment</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── C. COMPETITOR SENTIMENT PROFILES ── -->
+                        <div class="card" id="comp-section-c">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Competitor Sentiment Profiles <span class="info-icon">i</span></div>
+                                    <div class="card-subtitle">Click a brand to see how AI describes them</div>
+                                </div>
+                            </div>
+                            <div style="padding:0; display:flex; min-height:280px;">
+                                <div class="sent-brand-list" id="comp-brand-list"><!-- populated by JS --></div>
+                                <div class="sent-detail-wrap" id="comp-brand-detail"><!-- populated by JS --></div>
+                            </div>
+                        </div>
+
+                        <!-- ── D. COMPETITOR × TAG BREAKDOWN ── -->
+                        <div class="card" id="comp-section-d">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Competitor × Tag Breakdown <span class="info-icon">i</span></div>
+                                    <div class="card-subtitle">Coverage/SOV: ≥70% green · 40–69% amber · &lt;40% red &nbsp;|&nbsp; Avg Sentiment: ≥65 green · 45–64 amber · &lt;45 red</div>
+                                </div>
+                                <div style="display:flex;gap:6px;align-items:center;">
+                                    <span style="font-size:12px;color:#64748B;">Metric:</span>
+                                    <button class="btn-secondary active" onclick="UI.setCompHeatMetric('coverage', this)">Coverage</button>
+                                    <button class="btn-secondary" onclick="UI.setCompHeatMetric('sov', this)">SOV</button>
+                                    <button class="btn-secondary" onclick="UI.setCompHeatMetric('sentiment', this)">Avg Sentiment</button>
+                                </div>
+                            </div>
+                            <div style="padding:0; overflow-x:auto;">
+                                <table class="heatmap-table" id="comp-heatmap-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tag</th>
+                                            <th class="you-col">Aims <span class="badge-you">YOU</span></th>
+                                            <th>Equinix</th>
+                                            <th>TM One</th>
+                                            <th>Vantage DC</th>
+                                            <th>Bridge DC</th>
+                                            <th>NTT Ltd.</th>
+                                            <th style="background:#F1F5F9;color:#475569;">Row Avg</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="comp-heatmap-body"><!-- populated by JS --></tbody>
+                                    <tfoot>
+                                        <tr class="heat-avg-row" id="comp-heatmap-foot">
+                                            <td>Competitor Avg</td>
+                                            <td></td><td></td><td></td><td></td><td></td><td></td>
+                                            <td style="background:#E2E8F0;color:#334155;"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div><!-- /page-content -->
+                </div><!-- /view-competitive -->
 
                 <!-- =============== VIEW: PROMPT MANAGER =============== -->
                 <div class="view-section" id="view-prompt-manager">
@@ -197,8 +523,6 @@
 
                     <!-- ===== TAB: TRACKED PROMPTS ===== -->
                     <div class="tab-content active" id="tab-tracked">
-                        <div class="dev-note-bar"><button class="btn-dev-note" onclick="UI.showDevNote('tracked')">📋
-                                Note to Developer</button></div>
                         <h2 style="font-size:16px;font-weight:700;margin-bottom:16px">Summary Statistics</h2>
                         <div class="stats-grid" id="tracked-stats"></div>
                         <div class="tracked-controls-row">
@@ -265,8 +589,6 @@
 
                     <!-- ===== TAB: MANAGE PROMPTS ===== -->
                     <div class="tab-content" id="tab-manage">
-                        <div class="dev-note-bar"><button class="btn-dev-note" onclick="UI.showDevNote('manage')">📋
-                                Note to Developer</button></div>
                         <div class="manage-top-row">
                             <div class="flex items-center gap-12">
                                 <button class="btn btn-secondary" onclick="UI.generatePrompt()"><svg width="14"
@@ -314,9 +636,6 @@
 
                 <!-- ===== TAB: MANAGE TAGS ===== -->
                 <div class="tab-content" id="tab-tags">
-                    <div class="dev-note-bar"><button class="btn-dev-note" onclick="UI.showDevNote('tags')">📋 Note to
-                            Developer</button>
-                    </div>
                     <div class="flex items-center justify-between mb-16">
                         <div>
                             <h2 style="font-size:16px;font-weight:700">Tag Library</h2>
@@ -358,11 +677,121 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- =============== VIEW: KEY TOPICS ANALYSIS =============== -->
+                <div class="view-section" id="view-key-topics">
+
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Key Topics Analysis</h1>
+                            <div class="page-meta" id="kt-header-subtitle">
+                                Brand: AIMS &nbsp;|&nbsp; Scope: All Tags &nbsp;|&nbsp; Based on 100 AI responses
+                            </div>
+                        </div>
+                        <div class="page-header-actions">
+                            <!-- Tag filter (reuses global trackedFilterTags) -->
+                            <div class="action-dropdown-wrap" id="kt-tag-filter-wrap">
+                                <button class="action-btn" id="kt-tag-filter-btn" onclick="UI.toggleKtTagDropdown(event)">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                                    <span id="kt-tag-filter-label">All Tags</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+                                <div class="action-dropdown" id="kt-tag-dropdown">
+                                    <div class="action-dropdown-search">
+                                        <input type="text" placeholder="Search tags…" oninput="UI.filterKtTagList(this.value)" onclick="event.stopPropagation()">
+                                    </div>
+                                    <div class="action-dropdown-limit-note" id="kt-tag-limit-note" style="display:none">Max 3 tags — deselect one to change.</div>
+                                    <div id="kt-tag-list"></div>
+                                </div>
+                            </div>
+                            <button class="action-btn">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Last 30 days
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <button class="action-btn" onclick="UI.showExportToast()">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="kt-sections">
+
+                        <!-- Section A: Topic Landscape (treemap) -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Full Topic Landscape <i class="info-icon">i</i></div>
+                                    <div class="card-subtitle">All topics surfaced in AI responses &nbsp;·&nbsp; Cell size = how often the topic appeared &nbsp;·&nbsp; Colour = your brand's presence in that topic</div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="tm-legend">
+                                    <div class="tm-legend-item"><div class="tm-legend-dot" style="background:#DCFCE7;border:1px solid #86EFAC"></div>Your brand: owned</div>
+                                    <div class="tm-legend-item"><div class="tm-legend-dot" style="background:#FFFBEB;border:1px solid #FCD34D"></div>Your brand: present (mixed)</div>
+                                    <div class="tm-legend-item"><div class="tm-legend-dot" style="background:#F1F5F9;border:1px solid #CBD5E1"></div>Your brand: absent</div>
+                                </div>
+                                <div class="treemap" id="kt-treemap">
+                                    <!-- populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section B: Brand Leaders -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" style="border-left:3px solid #22C55E;padding-left:10px">Brand Leaders</div>
+                                    <div class="card-subtitle" style="padding-left:13px">Topics where AI already associates your brand — defend and maintain</div>
+                                </div>
+                                <span class="section-badge" id="kt-leaders-badge">0 topics</span>
+                            </div>
+                            <div class="card-body" style="padding-top:12px" id="kt-leaders-body">
+                                <!-- populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Section C: Battlegrounds -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" style="border-left:3px solid #F59E0B;padding-left:10px">Battlegrounds</div>
+                                    <div class="card-subtitle" style="padding-left:13px">Topics where you're present but not leading — your brand is in the fight</div>
+                                </div>
+                                <span class="section-badge" id="kt-battles-badge">0 topics</span>
+                            </div>
+                            <div class="card-body" style="padding-top:12px" id="kt-battles-body">
+                                <!-- populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Section D: Blind Spots -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" style="border-left:3px solid #CBD5E1;padding-left:10px">Blind Spots</div>
+                                    <div class="card-subtitle" style="padding-left:13px">Topics AI frequently discusses, but your brand isn't part of the conversation — sorted by mention count</div>
+                                </div>
+                                <span class="section-badge" id="kt-blinds-badge">0 topics</span>
+                            </div>
+                            <div class="card-body" style="padding-top:12px" id="kt-blinds-body">
+                                <!-- populated by JS -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-    </div>
-    </div>
+
+    <!-- ======== FLOATING DEV NOTE BUTTON ======== -->
+    <button class="btn-dev-note-float" onclick="UI.showCurrentDevNote()" title="Developer Notes">
+        📋 <span>Dev Notes</span>
+    </button>
 
     <!-- ======== MODALS ======== -->
     <!-- Create Tag Modal -->
@@ -465,6 +894,30 @@
             <div class="bulk-prompt-list" id="view-tagged-list" style="max-height: 300px;"></div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="UI.hideModal('modal-view-tagged-prompts')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Competitor Modal -->
+    <div class="modal-overlay" id="modal-add-competitor">
+        <div class="modal" style="max-width:480px;width:90%">
+            <div class="modal-title">Add Competitor</div>
+            <div class="modal-desc">Track a new competitor across your AI visibility data.</div>
+            <div class="modal-form-group">
+                <label class="modal-form-label">Competitor brand name <span style="color:#DC2626">*</span></label>
+                <input type="text" class="modal-form-input" id="add-comp-name" placeholder="e.g. Keppel Data Centres" maxlength="60">
+            </div>
+            <div class="modal-form-group">
+                <label class="modal-form-label">Primary website / domain <span style="color:#94A3B8;font-weight:400;">(optional)</span></label>
+                <input type="text" class="modal-form-input" id="add-comp-domain" placeholder="e.g. keppeldc.com">
+            </div>
+            <div class="modal-form-group">
+                <label class="modal-form-label">Alternate spellings / aliases <span style="color:#94A3B8;font-weight:400;">(optional)</span></label>
+                <input type="text" class="modal-form-input" id="add-comp-aliases" placeholder="e.g. Keppel DC, KDC">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="UI.hideModal('modal-add-competitor')">Cancel</button>
+                <button class="btn btn-blue" onclick="UI.submitAddCompetitor()">Add Competitor</button>
             </div>
         </div>
     </div>

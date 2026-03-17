@@ -4,7 +4,17 @@
    ============================================ */
 
 const ZicyState = (() => {
-    const STORAGE_KEY = 'zicyProtoData_v2';
+    const STORAGE_KEY = 'zicyProtoData_v3';
+
+    // ---- Competitor config (static flavour fields only) ----
+    const COMPETITOR_CONFIG = [
+        { name: 'Aims',                you: true,  sentiment: 74, sentimentClass: 'text-amber', descriptors: 'reliable, enterprise-grade' },
+        { name: 'Equinix',             you: false, sentiment: 81, sentimentClass: 'text-green', descriptors: 'global scale, premium' },
+        { name: 'TM One',              you: false, sentiment: 68, sentimentClass: 'text-amber', descriptors: 'local, affordable' },
+        { name: 'Vantage Data Centers',you: false, sentiment: 72, sentimentClass: 'text-amber', descriptors: 'modern, flexible' },
+        { name: 'Bridge Data Centres', you: false, sentiment: 61, sentimentClass: 'text-amber', descriptors: 'regional, growing' },
+        { name: 'NTT Ltd.',            you: false, sentiment: 76, sentimentClass: 'text-green', descriptors: 'enterprise, secure' },
+    ];
 
     // ---- Default Mock Data ----
     function getDefaultData() {
@@ -23,6 +33,19 @@ const ZicyState = (() => {
             { id: 't-012', name: 'Compliance', promptCount: 0, status: 'confirmed' },
         ];
 
+        // Helper: build per-prompt competitor data map from compact array
+        // Order: Equinix, TM One, Vantage Data Centers, Bridge Data Centres, NTT Ltd.
+        // Each entry: [mentions, cited, avgPosition, sovPct]
+        function mkComp(data) {
+            const names = ['Equinix', 'TM One', 'Vantage Data Centers', 'Bridge Data Centres', 'NTT Ltd.'];
+            const result = {};
+            names.forEach((name, i) => {
+                const [men, cit, pos, sov] = data[i];
+                result[name] = { mentions: men, total: 5, cited: cit, citedTotal: 5, avgPosition: pos, sovPct: sov };
+            });
+            return result;
+        }
+
         const prompts = [
             // ---- DRAFT (with AI-suggested new tags) ----
             {
@@ -35,7 +58,17 @@ const ZicyState = (() => {
                     { tagId: 't-010', status: 'existing' },
                     { tagId: 't-new-001', status: 'new' }
                 ],
-                responses: generateResponses(4, 5, 2.8, 50.7, 3, 5)
+                responses: Object.assign(generateResponses(4, 5, 2.8, 50.7, 3, 5), {
+                    sentimentScore: 72,
+                    sentimentDescriptors: { pos: ['enterprise-grade', 'scalable'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'AI Performance', yourBrand: true },
+                        { name: 'Performance', yourBrand: true },
+                        { name: 'Scalability', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,2.0,19.0],[0,0,0,0.0],[2,1,3.2,7.0],[0,0,0,0.0],[2,1,2.5,4.5]])
+                })
             },
             {
                 id: 'p-014',
@@ -56,9 +89,20 @@ const ZicyState = (() => {
                 category: 'Disaster Recovery Services',
                 tags: [
                     { tagId: 't-002', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' }
                 ],
-                responses: generateResponses(5, 5, 1.2, 35.3, 4, 5)
+                responses: Object.assign(generateResponses(5, 5, 1.2, 35.3, 4, 5), {
+                    sentimentScore: 78,
+                    sentimentDescriptors: { pos: ['reliable', 'secure'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Backup Speed', yourBrand: true },
+                        { name: 'Compliance', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.3,15.0],[2,0,2.5,7.5],[1,0,3.8,4.0],[1,0,3.2,3.5],[0,0,0,0.0]])
+                })
             },
             {
                 id: 'p-003',
@@ -67,9 +111,20 @@ const ZicyState = (() => {
                 category: 'Managed Services',
                 tags: [
                     { tagId: 't-003', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' }
                 ],
-                responses: generateResponses(5, 5, 1.4, 41.4, 4, 5)
+                responses: Object.assign(generateResponses(5, 5, 1.4, 41.4, 4, 5), {
+                    sentimentScore: 75,
+                    sentimentDescriptors: { pos: ['reliable', 'easy setup'], neg: ['complex onboarding'] },
+                    topics: [
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Customer Support', yourBrand: true },
+                        { name: 'Ease of Setup', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[2,1,2.5,14.0],[3,1,2.2,9.0],[1,1,3.5,4.5],[1,0,3.8,3.0],[1,0,2.8,2.5]])
+                })
             },
             {
                 id: 'p-004',
@@ -78,9 +133,20 @@ const ZicyState = (() => {
                 category: 'Colocation Services',
                 tags: [
                     { tagId: 't-004', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 3.0, 28.1, 4, 5)
+                responses: Object.assign(generateResponses(4, 5, 3.0, 28.1, 4, 5), {
+                    sentimentScore: 70,
+                    sentimentDescriptors: { pos: ['scalable', 'cost-effective'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Scalability', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Integrations', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.8,16.0],[1,0,2.6,5.0],[2,1,3.2,7.5],[2,1,3.0,6.0],[0,0,0,0.0]])
+                })
             },
             {
                 id: 'p-005',
@@ -92,7 +158,17 @@ const ZicyState = (() => {
                     { tagId: 't-009', status: 'existing' },
                     { tagId: 't-003', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 2.3, 25.1, 2, 5)
+                responses: Object.assign(generateResponses(4, 5, 2.3, 25.1, 2, 5), {
+                    sentimentScore: 72,
+                    sentimentDescriptors: { pos: ['secure', 'enterprise-grade'], neg: ['steep learning curve'] },
+                    topics: [
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Compliance', yourBrand: false },
+                        { name: 'Customer Support', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.0,18.0],[1,0,2.4,5.5],[1,0,3.5,3.5],[0,0,0,0.0],[1,1,2.5,3.0]])
+                })
             },
             {
                 id: 'p-006',
@@ -101,9 +177,20 @@ const ZicyState = (() => {
                 category: 'Data Center',
                 tags: [
                     { tagId: 't-006', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-003', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 1.3, 36.8, 3, 5)
+                responses: Object.assign(generateResponses(4, 5, 1.3, 36.8, 3, 5), {
+                    sentimentScore: 74,
+                    sentimentDescriptors: { pos: ['reliable', 'fast deployment'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Performance', yourBrand: true },
+                        { name: 'Customer Support', yourBrand: false },
+                        { name: 'Integrations', yourBrand: true },
+                    ],
+                    competitors: mkComp([[3,2,2.5,15.0],[2,0,2.2,8.0],[1,0,3.8,3.5],[1,0,3.5,3.0],[1,0,2.7,2.5]])
+                })
             },
             {
                 id: 'p-007',
@@ -115,7 +202,17 @@ const ZicyState = (() => {
                     { tagId: 't-002', status: 'existing' },
                     { tagId: 't-009', status: 'existing' }
                 ],
-                responses: generateResponses(5, 5, 1.2, 28.2, 3, 5)
+                responses: Object.assign(generateResponses(5, 5, 1.2, 28.2, 3, 5), {
+                    sentimentScore: 76,
+                    sentimentDescriptors: { pos: ['reliable', 'secure'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Backup Speed', yourBrand: true },
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.2,14.0],[2,1,2.5,7.0],[1,0,3.6,4.0],[1,0,3.3,3.0],[0,0,0,0.0]])
+                })
             },
             {
                 id: 'p-008',
@@ -124,9 +221,20 @@ const ZicyState = (() => {
                 category: 'Disaster Recovery Services',
                 tags: [
                     { tagId: 't-002', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 2.3, 29.4, 2, 5)
+                responses: Object.assign(generateResponses(4, 5, 2.3, 29.4, 2, 5), {
+                    sentimentScore: 77,
+                    sentimentDescriptors: { pos: ['reliable', 'secure'], neg: ['complex onboarding'] },
+                    topics: [
+                        { name: 'Backup Speed', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Data Security', yourBrand: false },
+                        { name: 'Performance', yourBrand: true },
+                    ],
+                    competitors: mkComp([[2,1,2.4,12.5],[2,1,2.3,8.5],[1,0,3.7,4.0],[1,0,3.4,3.2],[0,0,0,0.0]])
+                })
             },
             {
                 id: 'p-009',
@@ -135,9 +243,20 @@ const ZicyState = (() => {
                 category: 'Data Center',
                 tags: [
                     { tagId: 't-006', status: 'existing' },
-                    { tagId: 't-007', status: 'existing' }
+                    { tagId: 't-007', status: 'existing' },
+                    { tagId: 't-009', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 1.0, 34.8, 3, 5)
+                responses: Object.assign(generateResponses(4, 5, 1.0, 34.8, 3, 5), {
+                    sentimentScore: 73,
+                    sentimentDescriptors: { pos: ['scalable', 'fast deployment'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Cloud Connectivity', yourBrand: true },
+                        { name: 'Integrations', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Performance', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,2.0,20.0],[1,0,2.8,4.5],[2,1,3.5,6.0],[1,0,3.2,3.0],[1,1,2.5,3.5]])
+                })
             },
             {
                 id: 'p-010',
@@ -146,9 +265,20 @@ const ZicyState = (() => {
                 category: 'Cloud Connectivity',
                 tags: [
                     { tagId: 't-007', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 1.3, 22.3, 2, 5)
+                responses: Object.assign(generateResponses(4, 5, 1.3, 22.3, 2, 5), {
+                    sentimentScore: 71,
+                    sentimentDescriptors: { pos: ['fast deployment', 'scalable'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Cloud Connectivity', yourBrand: true },
+                        { name: 'Integrations', yourBrand: true },
+                        { name: 'Performance', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,1.8,22.0],[1,0,2.6,4.0],[1,0,3.8,3.5],[0,0,0,0.0],[1,1,2.4,3.0]])
+                })
             },
             {
                 id: 'p-011',
@@ -157,9 +287,20 @@ const ZicyState = (() => {
                 category: 'Managed Service Data Center',
                 tags: [
                     { tagId: 't-008', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-003', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 2.5, 34.4, 3, 5)
+                responses: Object.assign(generateResponses(4, 5, 2.5, 34.4, 3, 5), {
+                    sentimentScore: 74,
+                    sentimentDescriptors: { pos: ['reliable', 'easy setup'], neg: ['complex onboarding'] },
+                    topics: [
+                        { name: 'Customer Support', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Ease of Setup', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[2,1,2.7,13.0],[3,2,2.1,10.5],[1,0,3.6,4.0],[1,0,3.5,3.0],[1,0,2.8,2.5]])
+                })
             },
             {
                 id: 'p-012',
@@ -168,9 +309,20 @@ const ZicyState = (() => {
                 category: 'Colocation Services',
                 tags: [
                     { tagId: 't-004', status: 'existing' },
-                    { tagId: 't-009', status: 'existing' }
+                    { tagId: 't-009', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' }
                 ],
-                responses: generateResponses(4, 5, 1.0, 19.5, 1, 5)
+                responses: Object.assign(generateResponses(4, 5, 1.0, 19.5, 1, 5), {
+                    sentimentScore: 68,
+                    sentimentDescriptors: { pos: ['cost-effective', 'scalable'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Scalability', yourBrand: false },
+                        { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Integrations', yourBrand: true },
+                    ],
+                    competitors: mkComp([[3,2,2.5,17.0],[2,0,2.4,7.5],[3,2,3.0,8.5],[2,1,3.2,6.0],[0,0,0,0.0]])
+                })
             },
             {
                 id: 'p-013',
@@ -182,7 +334,194 @@ const ZicyState = (() => {
                     { tagId: 't-012', status: 'existing' },
                     { tagId: 't-009', status: 'existing' }
                 ],
-                responses: generateResponses(5, 5, 2.8, 50.7, 3, 5)
+                responses: Object.assign(generateResponses(5, 5, 2.8, 50.7, 3, 5), {
+                    sentimentScore: 79,
+                    sentimentDescriptors: { pos: ['secure', 'enterprise-grade'], neg: ['complex onboarding'] },
+                    topics: [
+                        { name: 'Compliance', yourBrand: true },
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Onboarding', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,1.9,21.0],[1,0,2.5,4.5],[2,2,3.3,5.5],[1,0,3.0,3.0],[2,1,2.4,4.5]])
+                })
+            },
+            // ---- 8 NEW ACTIVE PROMPTS ----
+            {
+                id: 'p-015',
+                text: "What's the best enterprise data center for compliance needs in Malaysia?",
+                state: 'active',
+                category: 'Data Center',
+                tags: [
+                    { tagId: 't-012', status: 'existing' },
+                    { tagId: 't-011', status: 'existing' },
+                    { tagId: 't-009', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(5, 5, 1.6, 38.5, 4, 5), {
+                    sentimentScore: 77,
+                    sentimentDescriptors: { pos: ['secure', 'enterprise-grade'], neg: ['complex onboarding'] },
+                    topics: [
+                        { name: 'Compliance', yourBrand: true },
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Onboarding', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.1,17.5],[1,0,2.5,4.5],[2,1,3.4,5.0],[1,0,3.0,2.5],[2,1,2.3,5.0]])
+                })
+            },
+            {
+                id: 'p-016',
+                text: 'Top AI data centers for LLM training in Southeast Asia',
+                state: 'active',
+                category: 'AI Data Center',
+                tags: [
+                    { tagId: 't-001', status: 'existing' },
+                    { tagId: 't-010', status: 'existing' },
+                    { tagId: 't-011', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(4, 5, 2.2, 33.0, 3, 5), {
+                    sentimentScore: 73,
+                    sentimentDescriptors: { pos: ['enterprise-grade', 'scalable'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'AI Performance', yourBrand: true },
+                        { name: 'Performance', yourBrand: true },
+                        { name: 'Scalability', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,2.0,19.0],[0,0,0,0.0],[2,1,3.2,7.0],[0,0,0,0.0],[2,1,2.5,4.5]])
+                })
+            },
+            {
+                id: 'p-017',
+                text: 'Best cloud connectivity providers for enterprise businesses in Malaysia',
+                state: 'active',
+                category: 'Cloud Connectivity',
+                tags: [
+                    { tagId: 't-007', status: 'existing' },
+                    { tagId: 't-011', status: 'existing' },
+                    { tagId: 't-009', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(4, 5, 1.8, 27.5, 2, 5), {
+                    sentimentScore: 72,
+                    sentimentDescriptors: { pos: ['fast deployment', 'scalable'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Cloud Connectivity', yourBrand: true },
+                        { name: 'Integrations', yourBrand: true },
+                        { name: 'Performance', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,1.9,21.0],[1,0,2.7,4.0],[1,0,3.8,3.0],[0,0,0,0.0],[1,1,2.5,3.5]])
+                })
+            },
+            {
+                id: 'p-018',
+                text: 'Most reliable data center for cybersecurity compliance in Malaysia',
+                state: 'active',
+                category: 'Cybersecurity Services',
+                tags: [
+                    { tagId: 't-005', status: 'existing' },
+                    { tagId: 't-012', status: 'existing' },
+                    { tagId: 't-009', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(5, 5, 1.4, 42.0, 4, 5), {
+                    sentimentScore: 80,
+                    sentimentDescriptors: { pos: ['secure', 'reliable'], neg: ['steep learning curve'] },
+                    topics: [
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Compliance', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Customer Support', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.0,18.5],[1,0,2.4,4.5],[1,0,3.5,3.5],[0,0,0,0.0],[2,2,2.3,5.0]])
+                })
+            },
+            {
+                id: 'p-019',
+                text: 'Best managed IT services for enterprise businesses in Malaysia',
+                state: 'active',
+                category: 'Managed Services',
+                tags: [
+                    { tagId: 't-003', status: 'existing' },
+                    { tagId: 't-011', status: 'existing' },
+                    { tagId: 't-009', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(4, 5, 2.0, 30.5, 3, 5), {
+                    sentimentScore: 74,
+                    sentimentDescriptors: { pos: ['reliable', 'easy setup'], neg: ['complex onboarding'] },
+                    topics: [
+                        { name: 'Customer Support', yourBrand: true },
+                        { name: 'Ease of Setup', yourBrand: true },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Onboarding', yourBrand: false },
+                    ],
+                    competitors: mkComp([[2,1,2.6,13.0],[3,2,2.1,10.0],[1,0,3.5,4.0],[1,0,3.4,3.0],[1,0,2.7,2.5]])
+                })
+            },
+            {
+                id: 'p-020',
+                text: 'Which data center offers the best disaster recovery SLA in Malaysia?',
+                state: 'active',
+                category: 'Disaster Recovery Services',
+                tags: [
+                    { tagId: 't-002', status: 'existing' },
+                    { tagId: 't-006', status: 'existing' },
+                    { tagId: 't-012', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(4, 5, 1.8, 31.0, 3, 5), {
+                    sentimentScore: 76,
+                    sentimentDescriptors: { pos: ['reliable', 'secure'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Backup Speed', yourBrand: true },
+                        { name: 'Data Security', yourBrand: true },
+                        { name: 'Compliance', yourBrand: true },
+                        { name: 'Reliability', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.2,15.5],[2,1,2.4,8.0],[1,0,3.7,3.5],[1,0,3.3,3.0],[1,0,2.6,2.5]])
+                })
+            },
+            {
+                id: 'p-021',
+                text: 'Best LLM infrastructure providers for AI workloads in Southeast Asia',
+                state: 'active',
+                category: 'LLM Infrastructure',
+                tags: [
+                    { tagId: 't-010', status: 'existing' },
+                    { tagId: 't-001', status: 'existing' },
+                    { tagId: 't-011', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(4, 5, 2.4, 29.0, 2, 5), {
+                    sentimentScore: 71,
+                    sentimentDescriptors: { pos: ['scalable', 'enterprise-grade'], neg: ['pricey', 'steep learning curve'] },
+                    topics: [
+                        { name: 'AI Performance', yourBrand: true },
+                        { name: 'Performance', yourBrand: true },
+                        { name: 'Scalability', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                    ],
+                    competitors: mkComp([[4,3,2.0,20.0],[0,0,0,0.0],[2,1,3.3,6.5],[0,0,0,0.0],[2,1,2.6,4.0]])
+                })
+            },
+            {
+                id: 'p-022',
+                text: 'Top colocation services for enterprise businesses in Malaysia',
+                state: 'active',
+                category: 'Colocation Services',
+                tags: [
+                    { tagId: 't-004', status: 'existing' },
+                    { tagId: 't-011', status: 'existing' },
+                    { tagId: 't-009', status: 'existing' }
+                ],
+                responses: Object.assign(generateResponses(4, 5, 2.6, 24.0, 3, 5), {
+                    sentimentScore: 69,
+                    sentimentDescriptors: { pos: ['cost-effective', 'scalable'], neg: ['pricey'] },
+                    topics: [
+                        { name: 'Scalability', yourBrand: true },
+                        { name: 'Pricing & Value', yourBrand: false },
+                        { name: 'Reliability', yourBrand: true },
+                        { name: 'Integrations', yourBrand: false },
+                    ],
+                    competitors: mkComp([[3,2,2.6,15.5],[1,0,2.5,5.0],[3,2,2.9,9.0],[2,1,3.1,5.5],[0,0,0,0.0]])
+                })
             },
         ];
 
@@ -198,17 +537,7 @@ const ZicyState = (() => {
         // Recalculate tag prompt counts
         recalcTagCounts(tags, prompts);
 
-        // Competitor data
-        const competitors = [
-            { name: 'Aims', you: true, brandMention: '52/60', avgRanking: 1.8, citations: '34/60', sov: '32.2%' },
-            { name: 'Equinix', you: false, brandMention: '34/60', avgRanking: 2.8, citations: '31/60', sov: '18.2%' },
-            { name: 'TM One', you: false, brandMention: '17/60', avgRanking: 2.4, citations: '9/60', sov: '4.8%' },
-            { name: 'Vantage Data Centers', you: false, brandMention: '19/60', avgRanking: 3.6, citations: '17/60', sov: '4.0%' },
-            { name: 'Bridge Data Centres', you: false, brandMention: '17/60', avgRanking: 3.2, citations: '9/60', sov: '3.3%' },
-            { name: 'NTT Ltd.', you: false, brandMention: '10/60', avgRanking: 2.6, citations: '7/60', sov: '2.7%' },
-        ];
-
-        return { tags, prompts, competitors, generatedCount: 0 };
+        return { tags, prompts, generatedCount: 0 };
     }
 
     function generateResponses(brandMentionNum, brandMentionDen, avgPosition, sov, citationNum, citationDen) {
@@ -530,9 +859,127 @@ const ZicyState = (() => {
             };
         },
 
-        // ---- Competitors ----
-        getCompetitors() {
-            return data.competitors || [];
+        // ---- Competitors (derived from filtered prompt set) ----
+        getCompetitorMetrics(promptList) {
+            if (!promptList) promptList = this.getActivePrompts();
+            const filtered = promptList.filter(p => p.responses);
+
+            // Compute Aims (you) from the prompts' own response metrics
+            let aimsMenNum = 0, aimsMenDen = 0, aimsCitNum = 0, aimsCitDen = 0;
+            let aimsSovSum = 0, aimsPosSum = 0, aimsCount = 0;
+            filtered.forEach(p => {
+                const [mn, md] = p.responses.brandMentionCoverage.split('/').map(Number);
+                const [cn, cd] = p.responses.citationCoverage.split('/').map(Number);
+                aimsMenNum += mn; aimsMenDen += md;
+                aimsCitNum += cn; aimsCitDen += cd;
+                aimsSovSum += parseFloat(p.responses.sov);
+                aimsPosSum += p.responses.avgPosition;
+                aimsCount++;
+            });
+            const aimsCfg = COMPETITOR_CONFIG.find(c => c.you);
+            const result = [{
+                name: aimsCfg.name, you: true,
+                brandMention: `${aimsMenNum}/${aimsMenDen}`,
+                avgRanking: aimsCount > 0 ? +(aimsPosSum / aimsCount).toFixed(1) : 0,
+                citations: `${aimsCitNum}/${aimsCitDen}`,
+                sov: `${aimsCount > 0 ? (aimsSovSum / aimsCount).toFixed(1) : '0'}%`,
+                sentiment: aimsCfg.sentiment, sentimentClass: aimsCfg.sentimentClass, descriptors: aimsCfg.descriptors
+            }];
+
+            // Compute each other competitor from per-prompt competitor data
+            COMPETITOR_CONFIG.filter(c => !c.you).forEach(cfg => {
+                let menNum = 0, menDen = 0, citNum = 0, citDen = 0;
+                let sovSum = 0, posSum = 0, posCount = 0, rowCount = 0;
+                filtered.forEach(p => {
+                    const cd = p.responses.competitors && p.responses.competitors[cfg.name];
+                    if (!cd) return;
+                    menNum += cd.mentions; menDen += cd.total;
+                    citNum += cd.cited; citDen += cd.citedTotal;
+                    sovSum += cd.sovPct;
+                    rowCount++;
+                    if (cd.mentions > 0) { posSum += cd.avgPosition; posCount++; }
+                });
+                result.push({
+                    name: cfg.name, you: false,
+                    brandMention: `${menNum}/${menDen}`,
+                    avgRanking: posCount > 0 ? +(posSum / posCount).toFixed(1) : 0,
+                    citations: `${citNum}/${citDen}`,
+                    sov: `${rowCount > 0 ? (sovSum / rowCount).toFixed(1) : '0'}%`,
+                    sentiment: cfg.sentiment, sentimentClass: cfg.sentimentClass, descriptors: cfg.descriptors
+                });
+            });
+
+            return result;
+        },
+
+        // ---- Brand Sentiment (derived from filtered prompt set) ----
+        getBrandSentiment(promptList) {
+            if (!promptList) promptList = this.getActivePrompts();
+            const filtered = promptList.filter(p => p.responses && p.responses.sentimentScore !== undefined);
+            if (!filtered.length) {
+                return { score: 0, tier: 'Neutral', responses: 0, pos: 33, neu: 34, neg: 33, positiveDescriptors: [], negativeDescriptors: [] };
+            }
+
+            const avgScore = Math.round(filtered.reduce((sum, p) => sum + p.responses.sentimentScore, 0) / filtered.length);
+
+            // Aggregate descriptor mention counts
+            const posMap = {}, negMap = {};
+            filtered.forEach(p => {
+                (p.responses.sentimentDescriptors.pos || []).forEach(d => { posMap[d] = (posMap[d] || 0) + 1; });
+                (p.responses.sentimentDescriptors.neg || []).forEach(d => { negMap[d] = (negMap[d] || 0) + 1; });
+            });
+            const totalPos = Object.values(posMap).reduce((a, b) => a + b, 0);
+            const totalNeg = Object.values(negMap).reduce((a, b) => a + b, 0);
+
+            const positiveDescriptors = Object.entries(posMap)
+                .sort((a, b) => b[1] - a[1]).slice(0, 5)
+                .map(([word, count]) => ({ word, count, share: `${Math.round(count / totalPos * 100)}%` }));
+            const negativeDescriptors = Object.entries(negMap)
+                .sort((a, b) => b[1] - a[1]).slice(0, 3)
+                .map(([word, count]) => ({ word, count, share: `${Math.round(count / totalNeg * 100)}%` }));
+
+            // Sentiment distribution derived from score
+            const pos = avgScore - 13;
+            const neg = Math.round((100 - avgScore) * 0.35);
+            const neu = 100 - pos - neg;
+            const tier = avgScore >= 70 ? 'Positive' : avgScore >= 55 ? 'Neutral' : 'Negative';
+
+            return { score: avgScore, tier, responses: filtered.length * 5, pos, neu, neg, positiveDescriptors, negativeDescriptors };
+        },
+
+        // ---- Key Topics (derived from filtered prompt set) ----
+        getKeyTopics(promptList) {
+            if (!promptList) promptList = this.getActivePrompts();
+            const filtered = promptList.filter(p => p.responses && p.responses.topics);
+
+            const topicMap = {};
+            filtered.forEach(p => {
+                p.responses.topics.forEach(t => {
+                    if (!topicMap[t.name]) topicMap[t.name] = { hits: 0, yourBrandHits: 0 };
+                    topicMap[t.name].hits++;
+                    if (t.yourBrand) topicMap[t.name].yourBrandHits++;
+                });
+            });
+
+            const topics = Object.entries(topicMap)
+                .map(([name, d]) => ({
+                    name,
+                    hits: d.hits,
+                    num: d.yourBrandHits,
+                    den: d.hits,
+                    pct: Math.round(d.yourBrandHits / d.hits * 100)
+                }))
+                .sort((a, b) => b.hits - a.hits);
+
+            return {
+                leaders: topics.filter(t => t.pct >= 60),
+                battles: topics.filter(t => t.pct >= 30 && t.pct < 60),
+                blinds:  topics.filter(t => t.pct < 30),
+            };
+        },
+
+        getPlatformRadar() {
+            return { chatgpt: 87, gemini: 71, perplexity: 79, googleAI: 64, aiOverview: 52 };
         },
 
         // ---- Counts ----
