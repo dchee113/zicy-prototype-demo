@@ -2195,12 +2195,17 @@ const UI = {
 <ol>
 <li><strong>Page header</strong> — Title, scope subtitle (Brand / Scope / Response count), functional tag filter dropdown (max 3 tags, shared global <code>trackedFilterTags</code> state), cosmetic date + export buttons. Subtitle updates dynamically when tag filter changes.</li>
 <li><strong>Section A — Full Topic Landscape (treemap)</strong> — CSS flex treemap. Rows flex by frequency sum; cells flex by individual frequency. Three colour tiers: green (owned ≥60%), amber (mixed 30–59%), gray (absent &lt;30%). Hover deepens brightness. No click action in v1.</li>
-<li><strong>Section B — Brand Leaders</strong> — Topics where AIMS % leads all competitors. Green left border. Default sort: Your Brand % descending.</li>
-<li><strong>Section C — Battlegrounds</strong> — Topics where AIMS is present but at least one competitor leads. Amber left border. Default sort: Your Brand % descending.</li>
-<li><strong>Section D — Blind Spots</strong> — Topics where AIMS has &lt;30% association. Gray left border. Default sort: Mentions descending (highest missed opportunity first).</li>
+<li><strong>Section B — Topic Buckets (combined card with pill toggle)</strong> — Brand Leaders, Battlegrounds, and Blind Spots share a single card. A pill toggle bar at the top switches between the three views. Only one bucket is visible at a time. The topic count badge and subtitle update to reflect the active tab. Default tab on page load: Brand Leaders.
+  <ul>
+    <li><strong>Brand Leaders</strong> — Topics where AIMS % ≥60%. Sort: Your Brand % descending.</li>
+    <li><strong>Battlegrounds</strong> — Topics where AIMS is 30–59%. Sort: Your Brand % descending.</li>
+    <li><strong>Blind Spots</strong> — Topics where AIMS is &lt;30%. Sort: Mentions descending (highest missed opportunity first).</li>
+  </ul>
+  Toggle is handled by <code>UI.switchKtSection(tab)</code> which sets <code>ktActiveSection</code> and calls <code>renderKeyTopics()</code>.
+</li>
 </ol>
 
-<h3>Table Structure (Sections B, C, D — identical)</h3>
+<h3>Table Structure (all three buckets — identical layout)</h3>
 <ul>
 <li>4 columns with <code>table-layout: fixed</code>: Topic (170px) | Mentions (90px, right-aligned, right-border divider) | Your Brand (210px, blue tint) | Competitors (auto, purple tint)</li>
 <li>Your Brand cell: 64×8px mini bar + fraction + % with tier colour</li>
