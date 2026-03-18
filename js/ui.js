@@ -41,6 +41,7 @@ let viewTagId = null;
 let tagSortField = 'name';
 let tagSortDir = 'asc';
 let trackedFilterTags = [];
+let ktActiveSection = 'leaders';
 let selectedTagId = null;
 let manageSectionPages = { draft: 1, active: 1, paused: 1 };
 const MANAGE_PAGE_SIZE = 20;
@@ -759,38 +760,47 @@ const UI = {
         const emptyState = (msg) =>
             `<div style="padding:20px 14px;font-size:13px;color:#94A3B8">${msg}</div>`;
 
-        // ── Section B: Brand Leaders ──────────────────────────────────
+        // ── Sections B/C/D: Render active tab into combined card ─────
         const leaders = [...kt.leaders].sort((a, b) => b.pct - a.pct);
-        const leadersEl = document.getElementById('kt-leaders-body');
-        const leadersBadge = document.getElementById('kt-leaders-badge');
-        if (leadersBadge) leadersBadge.textContent = `${leaders.length} topic${leaders.length !== 1 ? 's' : ''}`;
-        if (leadersEl) {
-            leadersEl.innerHTML = leaders.length > 0
-                ? renderTable(leaders, 'fill-green', 'pct-green', 'Closest Competitors')
-                : emptyState('No brand-leading topics found in this scope. Your brand may be present but not leading in any tracked topics.');
-        }
-
-        // ── Section C: Battlegrounds ──────────────────────────────────
         const battles = [...kt.battles].sort((a, b) => b.pct - a.pct);
-        const battlesEl = document.getElementById('kt-battles-body');
-        const battlesBadge = document.getElementById('kt-battles-badge');
-        if (battlesBadge) battlesBadge.textContent = `${battles.length} topic${battles.length !== 1 ? 's' : ''}`;
-        if (battlesEl) {
-            battlesEl.innerHTML = battles.length > 0
-                ? renderTable(battles, 'fill-amber', 'pct-amber', 'Topic Leaders')
-                : emptyState('No battleground topics found in this scope.');
+        const blinds  = [...kt.blinds]; // keep hits-desc order
+
+        const sectionBody    = document.getElementById('kt-section-body');
+        const sectionBadge   = document.getElementById('kt-section-badge');
+        const sectionSubtitle = document.getElementById('kt-section-subtitle');
+
+        const sectionConfig = {
+            leaders: {
+                data: leaders, fillClass: 'fill-green', pctClass: 'pct-green', compHeader: 'Closest Competitors',
+                subtitle: 'Topics where AI already associates your brand — defend and maintain',
+                empty: 'No brand-leading topics found in this scope.',
+            },
+            battles: {
+                data: battles, fillClass: 'fill-amber', pctClass: 'pct-amber', compHeader: 'Topic Leaders',
+                subtitle: "Topics where you're present but not leading — your brand is in the fight",
+                empty: 'No battleground topics found in this scope.',
+            },
+            blinds: {
+                data: blinds, fillClass: 'fill-gray', pctClass: 'pct-gray', compHeader: 'Topic Leaders',
+                subtitle: "Topics AI frequently discusses, but your brand isn't part of the conversation — sorted by mention count",
+                empty: 'No blind spots detected — your brand is present in all tracked topics for this scope.',
+            },
+        };
+
+        const cfg = sectionConfig[ktActiveSection];
+        if (sectionBadge)   sectionBadge.textContent   = `${cfg.data.length} topic${cfg.data.length !== 1 ? 's' : ''}`;
+        if (sectionSubtitle) sectionSubtitle.textContent = cfg.subtitle;
+        if (sectionBody) {
+            sectionBody.innerHTML = cfg.data.length > 0
+                ? renderTable(cfg.data, cfg.fillClass, cfg.pctClass, cfg.compHeader)
+                : emptyState(cfg.empty);
         }
 
-        // ── Section D: Blind Spots (already sorted by hits desc from getKeyTopics) ──
-        const blinds = [...kt.blinds]; // keep hits-desc order
-        const blindsEl = document.getElementById('kt-blinds-body');
-        const blindsBadge = document.getElementById('kt-blinds-badge');
-        if (blindsBadge) blindsBadge.textContent = `${blinds.length} topic${blinds.length !== 1 ? 's' : ''}`;
-        if (blindsEl) {
-            blindsEl.innerHTML = blinds.length > 0
-                ? renderTable(blinds, 'fill-gray', 'pct-gray', 'Topic Leaders')
-                : emptyState('No blind spots detected — your brand is present in all tracked topics for this scope.');
-        }
+        // sync pill button active states
+        ['leaders', 'battles', 'blinds'].forEach(key => {
+            const btn = document.getElementById(`kt-tab-${key}`);
+            if (btn) btn.classList.toggle('active', key === ktActiveSection);
+        });
 
         this.renderKtTagDropdown();
     },
@@ -834,6 +844,11 @@ const UI = {
         const input = document.querySelector('#kt-tag-dropdown .action-dropdown-search input');
         if (input && searchVal !== undefined) input._searchVal = searchVal;
         this.renderKtTagDropdown();
+    },
+
+    switchKtSection(tab) {
+        ktActiveSection = tab;
+        this.renderKeyTopics();
     },
 
     renderDashPrompts(prompts) {

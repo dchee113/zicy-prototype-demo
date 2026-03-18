@@ -739,44 +739,20 @@
                             </div>
                         </div>
 
-                        <!-- Section B: Brand Leaders -->
+                        <!-- Sections B/C/D: Combined topic buckets with toggle -->
                         <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="card-title" style="border-left:3px solid #22C55E;padding-left:10px">Brand Leaders</div>
-                                    <div class="card-subtitle" style="padding-left:13px">Topics where AI already associates your brand — defend and maintain</div>
+                            <div class="card-header" style="flex-direction:column;align-items:flex-start;gap:8px">
+                                <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                                    <div class="kt-pill-bar">
+                                        <button class="kt-pill-btn active" id="kt-tab-leaders" onclick="UI.switchKtSection('leaders')">Brand Leaders</button>
+                                        <button class="kt-pill-btn" id="kt-tab-battles" onclick="UI.switchKtSection('battles')">Battlegrounds</button>
+                                        <button class="kt-pill-btn" id="kt-tab-blinds" onclick="UI.switchKtSection('blinds')">Blind Spots</button>
+                                    </div>
+                                    <span class="section-badge" id="kt-section-badge">0 topics</span>
                                 </div>
-                                <span class="section-badge" id="kt-leaders-badge">0 topics</span>
+                                <div class="card-subtitle" id="kt-section-subtitle">Topics where AI already associates your brand — defend and maintain</div>
                             </div>
-                            <div class="card-body" style="padding-top:12px" id="kt-leaders-body">
-                                <!-- populated by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Section C: Battlegrounds -->
-                        <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="card-title" style="border-left:3px solid #F59E0B;padding-left:10px">Battlegrounds</div>
-                                    <div class="card-subtitle" style="padding-left:13px">Topics where you're present but not leading — your brand is in the fight</div>
-                                </div>
-                                <span class="section-badge" id="kt-battles-badge">0 topics</span>
-                            </div>
-                            <div class="card-body" style="padding-top:12px" id="kt-battles-body">
-                                <!-- populated by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Section D: Blind Spots -->
-                        <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="card-title" style="border-left:3px solid #CBD5E1;padding-left:10px">Blind Spots</div>
-                                    <div class="card-subtitle" style="padding-left:13px">Topics AI frequently discusses, but your brand isn't part of the conversation — sorted by mention count</div>
-                                </div>
-                                <span class="section-badge" id="kt-blinds-badge">0 topics</span>
-                            </div>
-                            <div class="card-body" style="padding-top:12px" id="kt-blinds-body">
+                            <div class="card-body" style="padding-top:12px" id="kt-section-body">
                                 <!-- populated by JS -->
                             </div>
                         </div>

@@ -4021,6 +4021,34 @@ th.col-per, td.col-per {
     flex-shrink: 0;
 }
 
+/* --- Key Topics bucket pill toggle --- */
+.kt-pill-bar {
+    display: flex;
+    gap: 3px;
+    background: #F1F5F9;
+    border-radius: 8px;
+    padding: 3px;
+}
+.kt-pill-btn {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    color: #64748B;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+.kt-pill-btn:hover { color: #334155; }
+.kt-pill-btn.active {
+    background: #fff;
+    color: #1E293B;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+}
+
 /* --- Topics tables (Brand Leaders / Battlegrounds / Blind Spots) --- */
 .topics-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .topics-table th {
